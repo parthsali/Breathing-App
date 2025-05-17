@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
+import { InitialCountdown } from './InitialCountdown';
 
 const breathingPatterns = [
   {
     name: 'Calm',
-    description: 'Relaxing breathing pattern',
+    description: 'Used for stress relief and relaxation',
     inhale: 4,
     hold: 4,
     exhale: 6,
@@ -17,7 +18,7 @@ const breathingPatterns = [
   },
   {
     name: 'Focus',
-    description: 'Energizing breathing pattern',
+    description: 'Used for concentration and mental clarity',
     inhale: 4,
     hold: 7,
     exhale: 8,
@@ -30,7 +31,7 @@ const breathingPatterns = [
   },
   {
     name: 'Balance',
-    description: 'Equal breathing pattern',
+    description: 'Used for emotional stability and grounding',
     inhale: 4,
     hold: 4,
     exhale: 4,
@@ -43,7 +44,7 @@ const breathingPatterns = [
   },
   {
     name: 'Deep',
-    description: 'Deep breathing pattern',
+    description: 'Used for anxiety relief and deep relaxation',
     inhale: 6,
     hold: 2,
     exhale: 7,
@@ -66,9 +67,9 @@ export const Controls: React.FC = () => {
     theme,
     setBreathingPattern,
     setTheme,
-    startBreathing,
-    stopBreathing,
   } = useBreathingStore();
+
+  const [showInitialCountdown, setShowInitialCountdown] = useState(false);
 
   const handlePatternSelect = (pattern: typeof breathingPatterns[0]) => {
     setBreathingPattern(pattern.inhale, pattern.hold, pattern.exhale);
@@ -77,28 +78,13 @@ export const Controls: React.FC = () => {
 
   return (
     <div 
-      className="fixed left-4 top-4 p-6 rounded-2xl w-80 transform transition-all duration-300"
+      className="fixed left-4 top-4 p-6 w-80 transform transition-all duration-300"
       style={{ 
         background: `${theme.background}99`,
-        backdropFilter: 'blur(8px)',
-        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)'
+        backdropFilter: 'blur(8px)'
       }}
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold" style={{ color: theme.primary }}>Breathing Patterns</h2>
-          <button
-            onClick={isBreathing ? stopBreathing : startBreathing}
-            className="px-6 py-2 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105"
-            style={{ 
-              background: isBreathing ? '#ef4444' : theme.primary,
-              boxShadow: `0 4px 14px ${isBreathing ? '#ef444480' : theme.primary + '80'}`
-            }}
-          >
-            {isBreathing ? 'Stop' : 'Start'} Breathing
-          </button>
-        </div>
-
         <div className="space-y-3">
           {breathingPatterns.map((pattern) => (
             <button
@@ -120,7 +106,7 @@ export const Controls: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div className="text-left">
                   <h3 
-                    className="font-semibold"
+                    className="font-semibold mb-1"
                     style={{ color: theme.primary === pattern.theme.primary 
                       ? pattern.theme.primary 
                       : '#374151' }}
@@ -128,7 +114,7 @@ export const Controls: React.FC = () => {
                     {pattern.name}
                   </h3>
                   <p 
-                    className="text-sm"
+                    className="text-xs opacity-70"
                     style={{ color: theme.primary === pattern.theme.primary 
                       ? `${pattern.theme.primary}CC`
                       : '#6B7280' }}
@@ -137,14 +123,6 @@ export const Controls: React.FC = () => {
                   </p>
                 </div>
                 <div className="text-right">
-                  <div 
-                    className="text-xs"
-                    style={{ color: theme.primary === pattern.theme.primary 
-                      ? `${pattern.theme.primary}99`
-                      : '#9CA3AF' }}
-                  >
-                    {pattern.theme.name}
-                  </div>
                   <div 
                     className="text-sm font-medium"
                     style={{ color: theme.primary === pattern.theme.primary 
@@ -161,18 +139,24 @@ export const Controls: React.FC = () => {
 
         {isBreathing && (
           <div 
-            className="text-center py-2 px-4 rounded-lg"
+            className="text-center py-3 px-4 rounded-lg"
             style={{ 
               background: `${theme.primary}20`,
               color: theme.primary
             }}
           >
-            <span className="font-medium">
-              Current Phase: {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
-            </span>
+            <div className="font-medium mb-1">
+              {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
+            </div>
+            <div className="text-sm opacity-80">
+              {currentPhase === 'inhale' && `${inhaleTime}s to inhale`}
+              {currentPhase === 'hold' && `${holdTime}s to hold`}
+              {currentPhase === 'exhale' && `${exhaleTime}s to exhale`}
+            </div>
           </div>
         )}
       </div>
+      {showInitialCountdown && <InitialCountdown />}
     </div>
   );
 }; 

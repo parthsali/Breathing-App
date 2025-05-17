@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { BreathingSphere } from './components/BreathingSphere';
 import { Controls } from './components/Controls';
+import { StartButton } from './components/StartButton';
 import { useBreathingStore } from './store/breathingStore';
 
 const App: React.FC = () => {
@@ -23,6 +24,7 @@ const App: React.FC = () => {
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
       <Controls />
+      <StartButton />
     </div>
   );
 }
