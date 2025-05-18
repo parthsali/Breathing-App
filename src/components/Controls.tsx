@@ -97,6 +97,11 @@ const CONTAINER_STYLES = {
       background: 'rgba(255, 255, 255, 0.1)',
       border: '2px solid rgba(255, 255, 255, 0.2)',
       boxShadow: 'none'
+    },
+    disabled: {
+      opacity: 0.5,
+      cursor: 'not-allowed',
+      pointerEvents: 'none'
     }
   }
 } as const;
@@ -124,6 +129,7 @@ export const Controls: React.FC = () => {
    * @param pattern - The selected breathing pattern
    */
   const handlePatternSelect = (pattern: BreathingPattern) => {
+    if (isBreathing) return; // Prevent pattern change during active session
     setBreathingPattern(pattern.inhale, pattern.hold, pattern.exhale);
     setTheme(pattern.theme);
   };
@@ -171,10 +177,12 @@ export const Controls: React.FC = () => {
               key={pattern.name}
               onClick={() => handlePatternSelect(pattern)}
               className={CONTAINER_STYLES.patternButton.base}
-              style={theme.primary === pattern.theme.primary
-                ? CONTAINER_STYLES.patternButton.active(pattern.theme.primary)
-                : CONTAINER_STYLES.patternButton.inactive
-              }
+              style={{
+                ...(theme.primary === pattern.theme.primary
+                  ? CONTAINER_STYLES.patternButton.active(pattern.theme.primary)
+                  : CONTAINER_STYLES.patternButton.inactive),
+                ...(isBreathing ? CONTAINER_STYLES.patternButton.disabled : {})
+              }}
             >
               <div className="flex justify-between items-center">
                 <div className="text-left">
