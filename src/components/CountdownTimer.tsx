@@ -1,10 +1,43 @@
+/**
+ * CountdownTimer component that displays the remaining time for each breathing phase.
+ * Shows a countdown timer and the current breathing phase name.
+ */
 import React, { useEffect, useState } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
 
+/**
+ * Configuration for the countdown timer
+ */
+const TIMER_CONFIG = {
+  updateInterval: 100, // Update every 100ms for smooth countdown
+  styles: {
+    container: "fixed inset-0 flex items-center justify-center pointer-events-none",
+    content: "text-center transform transition-all duration-300",
+    timer: "text-8xl font-bold mb-4",
+    phase: "text-3xl font-medium",
+    blur: {
+      backdrop: 'blur(8px)',
+      text: 'blur(0.5px)'
+    }
+  }
+} as const;
+
+/**
+ * Type definition for breathing phases
+ */
+type BreathingPhase = 'inhale' | 'hold' | 'exhale' | 'rest';
+
+/**
+ * CountdownTimer component that displays the remaining time for each breathing phase
+ * @returns {JSX.Element | null} The rendered countdown timer or null if not breathing
+ */
 export const CountdownTimer: React.FC = () => {
   const { isBreathing, currentPhase, inhaleTime, holdTime, exhaleTime, theme } = useBreathingStore();
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
 
+  /**
+   * Effect to handle the countdown timer for each breathing phase
+   */
   useEffect(() => {
     if (!isBreathing) {
       setTimeLeft(0);
@@ -13,11 +46,7 @@ export const CountdownTimer: React.FC = () => {
 
     let interval: number;
     const startTime = Date.now();
-    const totalTime = currentPhase === 'inhale' 
-      ? inhaleTime * 1000 
-      : currentPhase === 'hold' 
-        ? holdTime * 1000 
-        : exhaleTime * 1000;
+    const totalTime = getPhaseDuration(currentPhase, inhaleTime, holdTime, exhaleTime);
 
     interval = window.setInterval(() => {
       const elapsed = Date.now() - startTime;
@@ -27,7 +56,7 @@ export const CountdownTimer: React.FC = () => {
       if (remaining === 0) {
         clearInterval(interval);
       }
-    }, 100);
+    }, TIMER_CONFIG.updateInterval);
 
     return () => clearInterval(interval);
   }, [isBreathing, currentPhase, inhaleTime, holdTime, exhaleTime]);
@@ -36,29 +65,64 @@ export const CountdownTimer: React.FC = () => {
 
   return (
     <div 
-      className="fixed inset-0 flex items-center justify-center pointer-events-none"
-      style={{ backdropFilter: 'blur(8px)' }}
+      className={TIMER_CONFIG.styles.container}
+      style={{ backdropFilter: TIMER_CONFIG.styles.blur.backdrop }}
     >
       <div 
-        className="text-center transform transition-all duration-300"
+        className={TIMER_CONFIG.styles.content}
         style={{ 
           textShadow: `0 0 20px ${theme.primary}40`,
-          filter: 'blur(0.5px)'
+          filter: TIMER_CONFIG.styles.blur.text
         }}
       >
         <div 
-          className="text-8xl font-bold mb-4"
+          className={TIMER_CONFIG.styles.timer}
           style={{ color: theme.primary }}
         >
           {timeLeft}
         </div>
         <div 
-          className="text-3xl font-medium"
+          className={TIMER_CONFIG.styles.phase}
           style={{ color: theme.primary }}
         >
-          {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
+          {capitalizeFirstLetter(currentPhase)}
         </div>
       </div>
     </div>
   );
+};
+
+/**
+ * Gets the duration in milliseconds for the current breathing phase
+ * @param phase - The current breathing phase
+ * @param inhaleTime - Duration of inhale phase in seconds
+ * @param holdTime - Duration of hold phase in seconds
+ * @param exhaleTime - Duration of exhale phase in seconds
+ * @returns {number} The duration in milliseconds
+ */
+const getPhaseDuration = (
+  phase: BreathingPhase,
+  inhaleTime: number,
+  holdTime: number,
+  exhaleTime: number
+): number => {
+  switch (phase) {
+    case 'inhale':
+      return inhaleTime * 1000;
+    case 'hold':
+      return holdTime * 1000;
+    case 'exhale':
+      return exhaleTime * 1000;
+    case 'rest':
+      return 0;
+  }
+};
+
+/**
+ * Capitalizes the first letter of a string
+ * @param str - The string to capitalize
+ * @returns {string} The capitalized string
+ */
+const capitalizeFirstLetter = (str: string): string => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }; 

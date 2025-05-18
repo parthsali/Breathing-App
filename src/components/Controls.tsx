@@ -1,8 +1,32 @@
+/**
+ * Controls component that manages breathing patterns and displays the current breathing state.
+ * Provides a UI for selecting different breathing patterns and shows the current breathing phase.
+ */
 import React, { useState } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
 import { InitialCountdown } from './InitialCountdown';
 
-const breathingPatterns = [
+/**
+ * Type definition for a breathing pattern
+ */
+interface BreathingPattern {
+  name: string;
+  description: string;
+  inhale: number;
+  hold: number;
+  exhale: number;
+  theme: {
+    name: string;
+    primary: string;
+    secondary: string;
+    background: string;
+  };
+}
+
+/**
+ * Predefined breathing patterns with their associated themes and timing
+ */
+const BREATHING_PATTERNS: BreathingPattern[] = [
   {
     name: 'Calm',
     description: 'Used for stress relief and relaxation',
@@ -57,6 +81,30 @@ const breathingPatterns = [
   }
 ];
 
+/**
+ * Styles for the controls container
+ */
+const CONTAINER_STYLES = {
+  base: "fixed left-4 top-4 p-6 w-80 transform transition-all duration-300",
+  patternButton: {
+    base: "w-full p-4 rounded-xl transition-all duration-300 transform hover:scale-102",
+    active: (theme: string) => ({
+      background: `${theme}20`,
+      border: `2px solid ${theme}`,
+      boxShadow: `0 4px 14px ${theme}40`
+    }),
+    inactive: {
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: '2px solid rgba(255, 255, 255, 0.2)',
+      boxShadow: 'none'
+    }
+  }
+} as const;
+
+/**
+ * Controls component that manages breathing patterns and displays the current breathing state
+ * @returns {JSX.Element} The rendered controls interface
+ */
 export const Controls: React.FC = () => {
   const {
     inhaleTime,
@@ -71,14 +119,46 @@ export const Controls: React.FC = () => {
 
   const [showInitialCountdown, setShowInitialCountdown] = useState(false);
 
-  const handlePatternSelect = (pattern: typeof breathingPatterns[0]) => {
+  /**
+   * Handles the selection of a breathing pattern
+   * @param pattern - The selected breathing pattern
+   */
+  const handlePatternSelect = (pattern: BreathingPattern) => {
     setBreathingPattern(pattern.inhale, pattern.hold, pattern.exhale);
     setTheme(pattern.theme);
   };
 
+  /**
+   * Renders the current breathing phase information
+   */
+  const renderBreathingPhase = () => {
+    if (!isBreathing) return null;
+
+    const phaseText = {
+      inhale: `${inhaleTime}s to inhale`,
+      hold: `${holdTime}s to hold`,
+      exhale: `${exhaleTime}s to exhale`
+    }[currentPhase];
+
+    return (
+      <div 
+        className="text-center py-3 px-4 rounded-lg"
+        style={{ 
+          background: `${theme.primary}20`,
+          color: theme.primary
+        }}
+      >
+        <div className="font-medium mb-1">
+          {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
+        </div>
+        <div className="text-sm opacity-80">{phaseText}</div>
+      </div>
+    );
+  };
+
   return (
     <div 
-      className="fixed left-4 top-4 p-6 w-80 transform transition-all duration-300"
+      className={CONTAINER_STYLES.base}
       style={{ 
         background: `${theme.background}99`,
         backdropFilter: 'blur(8px)'
@@ -86,22 +166,15 @@ export const Controls: React.FC = () => {
     >
       <div className="space-y-6">
         <div className="space-y-3">
-          {breathingPatterns.map((pattern) => (
+          {BREATHING_PATTERNS.map((pattern) => (
             <button
               key={pattern.name}
               onClick={() => handlePatternSelect(pattern)}
-              className="w-full p-4 rounded-xl transition-all duration-300 transform hover:scale-102"
-              style={{
-                background: theme.primary === pattern.theme.primary 
-                  ? `${pattern.theme.primary}20`
-                  : 'rgba(255, 255, 255, 0.1)',
-                border: `2px solid ${theme.primary === pattern.theme.primary 
-                  ? pattern.theme.primary 
-                  : 'rgba(255, 255, 255, 0.2)'}`,
-                boxShadow: theme.primary === pattern.theme.primary 
-                  ? `0 4px 14px ${pattern.theme.primary}40`
-                  : 'none'
-              }}
+              className={CONTAINER_STYLES.patternButton.base}
+              style={theme.primary === pattern.theme.primary
+                ? CONTAINER_STYLES.patternButton.active(pattern.theme.primary)
+                : CONTAINER_STYLES.patternButton.inactive
+              }
             >
               <div className="flex justify-between items-center">
                 <div className="text-left">
@@ -136,25 +209,7 @@ export const Controls: React.FC = () => {
             </button>
           ))}
         </div>
-
-        {isBreathing && (
-          <div 
-            className="text-center py-3 px-4 rounded-lg"
-            style={{ 
-              background: `${theme.primary}20`,
-              color: theme.primary
-            }}
-          >
-            <div className="font-medium mb-1">
-              {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
-            </div>
-            <div className="text-sm opacity-80">
-              {currentPhase === 'inhale' && `${inhaleTime}s to inhale`}
-              {currentPhase === 'hold' && `${holdTime}s to hold`}
-              {currentPhase === 'exhale' && `${exhaleTime}s to exhale`}
-            </div>
-          </div>
-        )}
+        {renderBreathingPhase()}
       </div>
       {showInitialCountdown && <InitialCountdown />}
     </div>
