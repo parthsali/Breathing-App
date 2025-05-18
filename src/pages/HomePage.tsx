@@ -65,26 +65,30 @@ const BUTTON_STYLES = {
 const HELP_INSTRUCTIONS = [
   {
     title: "Getting Started",
-    steps: [
+    items: [
       "Choose a breathing pattern from the left panel",
-      "Click 'Start Breathing' to begin your session",
-      "Follow the sphere's rhythm - expand on inhale, hold, and contract on exhale"
+      "Set your desired session duration",
+      "Click 'Start' to begin your session",
+      "Create your own custom breathing pattern with personalized timings"
     ]
   },
   {
     title: "During Session",
-    steps: [
-      "Focus on the breathing sphere's movement",
-      "Timer shows your session duration",
-      "Pattern controls are locked during active sessions"
+    items: [
+      "Follow the expanding and contracting sphere",
+      "Breathe in when the sphere expands",
+      "Hold when the sphere is at its largest",
+      "Breathe out when the sphere contracts",
+      "Stay focused on your breath and the visual guide"
     ]
   },
   {
     title: "Tracking Progress",
-    steps: [
-      "View your breathing history in Stats",
-      "Check patterns used and session durations",
-      "Monitor your progress over time"
+    items: [
+      "View your session history in the Stats page",
+      "Track total sessions and duration",
+      "Monitor your longest and average sessions",
+      "See your recent breathing exercises"
     ]
   }
 ] as const;
@@ -196,14 +200,14 @@ const HomePage: React.FC = () => {
                 <div key={index} className="space-y-2">
                   <h3 className="font-medium" style={{ color: theme.primary }}>{section.title}</h3>
                   <ul className="space-y-1.5">
-                    {section.steps.map((step, stepIndex) => (
+                    {section.items.map((item, itemIndex) => (
                       <li 
-                        key={stepIndex} 
+                        key={itemIndex} 
                         className="text-sm opacity-80 flex items-start"
                         style={{ color: theme.primary }}
                       >
                         <span className="mr-2 mt-0.5">•</span>
-                        <span>{step}</span>
+                        <span>{item}</span>
                       </li>
                     ))}
                   </ul>
