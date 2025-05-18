@@ -6,7 +6,7 @@
  * - Theme-aware styling
  * - Automatic pattern name detection
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
 
 /**

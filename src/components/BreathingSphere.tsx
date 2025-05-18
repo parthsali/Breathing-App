@@ -69,7 +69,7 @@ export const BreathingSphere: React.FC = () => {
     holdTime,
     exhaleTime,
     isBreathing,
-    currentPhase,
+    
     theme,
     setCurrentPhase,
   } = useBreathingStore();
@@ -90,6 +90,7 @@ export const BreathingSphere: React.FC = () => {
   }, [isBreathing]);
 
   useFrame((state, delta) => {
+    console.log(state)
     if (!sphereRef.current || !outerSphereRef.current) return;
 
     if (isResetting.current) {
