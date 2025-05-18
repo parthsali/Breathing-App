@@ -1,12 +1,22 @@
 /**
  * InitialCountdown component that displays a countdown before starting the breathing exercise.
  * Shows a 3-2-1 countdown with a "Go!" message at the end.
+ * Features:
+ * - Animated countdown display
+ * - Blur effect background
+ * - Theme-aware styling
+ * - Automatic breathing session start
  */
 import React, { useEffect, useState } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
 
 /**
- * Configuration for the countdown
+ * Configuration for the countdown display and behavior
+ * Defines:
+ * - Initial countdown value
+ * - Timer interval
+ * - Visual styles for container and numbers
+ * - Blur effects for background and text
  */
 const COUNTDOWN_CONFIG = {
   initialCount: 3,
@@ -24,6 +34,13 @@ const COUNTDOWN_CONFIG = {
 
 /**
  * InitialCountdown component that displays a countdown before starting the breathing exercise
+ * Features:
+ * - Animated countdown from 3 to 1
+ * - "Go!" message at countdown end
+ * - Blur effect background
+ * - Theme-aware styling with glow effects
+ * - Automatic breathing session start
+ * 
  * @returns {JSX.Element | null} The rendered countdown interface or null when finished
  */
 export const InitialCountdown: React.FC = () => {

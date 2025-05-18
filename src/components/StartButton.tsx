@@ -1,6 +1,11 @@
 /**
  * StartButton component that controls the breathing exercise session.
  * Provides a button to start/stop the breathing exercise and manages the initial countdown.
+ * Features:
+ * - Start/Stop session control
+ * - Initial countdown before session start
+ * - Session data persistence
+ * - Theme-aware styling
  */
 import React, { useState, useEffect } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
@@ -8,6 +13,10 @@ import { InitialCountdown } from './InitialCountdown';
 
 /**
  * Styles for the start/stop button
+ * Defines the visual appearance of:
+ * - Base button styles with hover effects
+ * - Start state with theme-based colors
+ * - Stop state with red color scheme
  */
 const BUTTON_STYLES = {
   base: "absolute right-8 top-8 px-5 py-2.5 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105",
@@ -23,6 +32,12 @@ const BUTTON_STYLES = {
 
 /**
  * Interface for a breathing session
+ * Defines the structure of session data stored in localStorage:
+ * - Unique identifier
+ * - Breathing pattern details
+ * - Session duration
+ * - Timestamp
+ * - Individual phase timings
  */
 interface Session {
   id: string;
@@ -34,6 +49,12 @@ interface Session {
   exhaleTime: number;
 }
 
+/**
+ * Props for the StartButton component
+ * Optional callbacks for countdown events:
+ * - onCountdownStart: Triggered when countdown begins
+ * - onCountdownEnd: Triggered when countdown completes
+ */
 interface StartButtonProps {
   onCountdownStart?: () => void;
   onCountdownEnd?: () => void;
@@ -41,6 +62,14 @@ interface StartButtonProps {
 
 /**
  * StartButton component that controls the breathing exercise session
+ * Features:
+ * - Session start/stop control
+ * - Initial countdown management
+ * - Session data persistence in localStorage
+ * - Theme-aware button styling
+ * - Automatic countdown state management
+ * 
+ * @param {StartButtonProps} props - Component props for countdown callbacks
  * @returns {JSX.Element} The rendered start/stop button
  */
 export const StartButton: React.FC<StartButtonProps> = ({ onCountdownStart, onCountdownEnd }) => {

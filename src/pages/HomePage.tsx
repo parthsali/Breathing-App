@@ -1,6 +1,7 @@
 /**
  * HomePage component that renders the breathing exercise interface.
  * This component sets up the 3D scene with Three.js and manages the overall layout.
+ * It includes the breathing sphere visualization, controls, and navigation elements.
  */
 import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
@@ -15,6 +16,8 @@ import { CustomBreathing } from '../components/CustomBreathing';
 
 /**
  * Scene configuration for the 3D environment
+ * Defines camera settings, fog parameters, and star field properties
+ * for the Three.js scene
  */
 const SCENE_CONFIG = {
   camera: {
@@ -36,6 +39,11 @@ const SCENE_CONFIG = {
   }
 } as const;
 
+/**
+ * Button style configurations for different UI elements
+ * Each style variant includes background, border, shadow, and color properties
+ * that adapt to the current theme
+ */
 const BUTTON_STYLES = {
   base: "px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105",
   start: (theme: string) => ({
@@ -62,6 +70,10 @@ const BUTTON_STYLES = {
   })
 } as const;
 
+/**
+ * Help instructions content organized into sections
+ * Provides structured guidance for users on how to use the application
+ */
 const HELP_INSTRUCTIONS = [
   {
     title: "Getting Started",

@@ -1,6 +1,9 @@
 /**
  * BreathingSphere component that renders an animated sphere for breathing exercises.
  * The sphere expands and contracts based on the breathing cycle phases.
+ * Uses Three.js for 3D rendering and animation, with two layered spheres:
+ * - Inner sphere: Main breathing visualization with distortion effect
+ * - Outer sphere: Secondary visualization with wobble effect
  */
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
@@ -10,6 +13,9 @@ import * as THREE from 'three';
 
 /**
  * Configuration for the breathing sphere materials
+ * Defines visual properties for both inner and outer spheres:
+ * - Inner sphere: Distorted material with metallic finish
+ * - Outer sphere: Wobbling material with lower opacity
  */
 const MATERIAL_CONFIG = {
   inner: {
@@ -28,6 +34,9 @@ const MATERIAL_CONFIG = {
 
 /**
  * Configuration for the sphere geometry
+ * Defines size and detail level for both spheres:
+ * - Inner sphere: Higher detail (64 segments)
+ * - Outer sphere: Lower detail (32 segments) with larger scale
  */
 const SPHERE_CONFIG = {
   inner: {
@@ -41,6 +50,12 @@ const SPHERE_CONFIG = {
 
 /**
  * BreathingSphere component that renders an animated sphere for breathing exercises
+ * Features:
+ * - Smooth expansion/contraction based on breathing phases
+ * - Automatic phase transitions (inhale, hold, exhale)
+ * - Smooth reset animation when breathing stops
+ * - Continuous rotation of outer sphere
+ * 
  * @returns {JSX.Element} The rendered breathing sphere
  */
 export const BreathingSphere: React.FC = () => {

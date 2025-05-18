@@ -1,5 +1,23 @@
+/**
+ * Global state management for the breathing exercise application.
+ * Uses Zustand for state management and provides a centralized store for:
+ * - Breathing pattern configuration
+ * - Session state management
+ * - Theme customization
+ * - UI state synchronization
+ */
+
 import { create } from 'zustand';
 
+/**
+ * Interface defining the shape of the breathing exercise state
+ * Includes:
+ * - Breathing pattern timing (inhale, hold, exhale)
+ * - Session state (isBreathing, currentPhase)
+ * - Session tracking (elapsedTime)
+ * - Theme configuration
+ * - State modification methods
+ */
 interface BreathingState {
   inhaleTime: number;
   holdTime: number;
@@ -23,6 +41,12 @@ interface BreathingState {
   setElapsedTime: (time: number) => void;
 }
 
+/**
+ * Updates the scrollbar colors based on the primary theme color
+ * Converts hex color to RGB and applies with opacity for thumb and hover states
+ * 
+ * @param {string} primary - The primary theme color in hex format
+ */
 const updateScrollbarColors = (primary: string) => {
   const root = document.documentElement;
   const primaryColor = primary.replace('#', '');
@@ -34,6 +58,14 @@ const updateScrollbarColors = (primary: string) => {
   root.style.setProperty('--scrollbar-thumb-hover', `rgba(${r}, ${g}, ${b}, 0.7)`);
 };
 
+/**
+ * Zustand store for managing breathing exercise state
+ * Provides:
+ * - Default breathing pattern (4-4-6)
+ * - Default theme (blue/teal)
+ * - State modification methods
+ * - Theme synchronization with UI elements
+ */
 export const useBreathingStore = create<BreathingState>((set, get) => ({
   inhaleTime: 4,
   holdTime: 4,

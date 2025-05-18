@@ -1,6 +1,25 @@
+/**
+ * CustomBreathing component that allows users to create and apply custom breathing patterns.
+ * Features:
+ * - Customizable inhale, hold, and exhale durations
+ * - Collapsible form interface
+ * - Input validation and constraints
+ * - Theme-aware styling
+ * - Disabled state during active sessions
+ */
+
 import React, { useState } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
 
+/**
+ * Styles for the custom breathing interface
+ * Defines the visual appearance of:
+ * - Main container with blur effect
+ * - Form layout and spacing
+ * - Input fields and labels
+ * - Checkbox and button styles
+ * - Collapsed state appearance
+ */
 const CUSTOM_STYLES = {
   container: "fixed left-8 top-[calc(4rem+24rem)] p-3 w-48 transform transition-all duration-300",
   form: "space-y-2",
@@ -12,6 +31,18 @@ const CUSTOM_STYLES = {
   collapsed: "flex items-center justify-between cursor-pointer"
 } as const;
 
+/**
+ * CustomBreathing component that allows users to create and apply custom breathing patterns
+ * Features:
+ * - Customizable breathing pattern creation
+ * - Input validation (1-10 seconds for inhale/exhale, 0-10 for hold)
+ * - Collapsible form interface
+ * - Theme-aware styling with blur effects
+ * - Disabled state during active sessions
+ * - Neutral theme when custom pattern is active
+ * 
+ * @returns {JSX.Element} The rendered custom breathing interface
+ */
 export const CustomBreathing: React.FC = () => {
   const { theme, setBreathingPattern, isBreathing, inhaleTime, holdTime, exhaleTime, setTheme } = useBreathingStore();
   const [isCustomActive, setIsCustomActive] = useState(false);

@@ -1,6 +1,11 @@
 /**
  * Controls component that manages breathing patterns and displays the current breathing state.
  * Provides a UI for selecting different breathing patterns and shows the current breathing phase.
+ * Features:
+ * - Predefined breathing patterns with different themes and timing
+ * - Real-time breathing phase display
+ * - Pattern selection with visual feedback
+ * - Theme integration with the main visualization
  */
 import React, { useState } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
@@ -8,6 +13,10 @@ import { InitialCountdown } from './InitialCountdown';
 
 /**
  * Type definition for a breathing pattern
+ * Defines the structure of breathing patterns including:
+ * - Name and description
+ * - Timing for inhale, hold, and exhale phases
+ * - Associated theme colors
  */
 interface BreathingPattern {
   name: string;
@@ -25,6 +34,11 @@ interface BreathingPattern {
 
 /**
  * Predefined breathing patterns with their associated themes and timing
+ * Each pattern is designed for specific purposes:
+ * - Calm: Stress relief and relaxation
+ * - Focus: Concentration and mental clarity
+ * - Balance: Emotional stability and grounding
+ * - Deep: Anxiety relief and deep relaxation
  */
 const BREATHING_PATTERNS: BreathingPattern[] = [
   {
@@ -82,7 +96,11 @@ const BREATHING_PATTERNS: BreathingPattern[] = [
 ];
 
 /**
- * Styles for the controls container
+ * Styles for the controls container and pattern buttons
+ * Defines the visual appearance of:
+ * - Main controls container with blur effect
+ * - Pattern selection buttons with active/inactive states
+ * - Disabled state for buttons during active sessions
  */
 const CONTAINER_STYLES = {
   base: "fixed left-4 top-4 p-4 w-80 transform transition-all duration-300",
@@ -108,6 +126,12 @@ const CONTAINER_STYLES = {
 
 /**
  * Controls component that manages breathing patterns and displays the current breathing state
+ * Features:
+ * - Pattern selection with visual feedback
+ * - Real-time breathing phase display
+ * - Theme integration
+ * - Disabled state during active sessions
+ * 
  * @returns {JSX.Element} The rendered controls interface
  */
 export const Controls: React.FC = () => {
