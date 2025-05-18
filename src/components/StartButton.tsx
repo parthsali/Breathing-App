@@ -73,7 +73,7 @@ interface StartButtonProps {
  * @returns {JSX.Element} The rendered start/stop button
  */
 export const StartButton: React.FC<StartButtonProps> = ({ onCountdownStart, onCountdownEnd }) => {
-  const { isBreathing, theme, startBreathing, stopBreathing, inhaleTime, holdTime, exhaleTime, elapsedTime } = useBreathingStore();
+  const { isBreathing, theme, stopBreathing, inhaleTime, holdTime, exhaleTime, elapsedTime } = useBreathingStore();
   const [showInitialCountdown, setShowInitialCountdown] = useState(false);
 
   // Reset countdown state when breathing starts

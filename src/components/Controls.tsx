@@ -156,6 +156,7 @@ export const Controls: React.FC = () => {
     if (isBreathing) return; // Prevent pattern change during active session
     setBreathingPattern(pattern.inhale, pattern.hold, pattern.exhale);
     setTheme(pattern.theme);
+    setShowInitialCountdown(prev => prev)
   };
 
   /**

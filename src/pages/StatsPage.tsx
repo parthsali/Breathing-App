@@ -153,8 +153,7 @@ export const StatsPage: React.FC = () => {
   // Calculate statistics
   const totalSessions = sessions.length;
   const totalDuration = sessions.reduce((acc, session) => acc + session.duration, 0);
-  const averageDuration = totalSessions > 0 ? Math.round(totalDuration / totalSessions / 60) : 0;
-
+  
   // Pagination calculations
   const totalPages = Math.ceil(sessions.length / sessionsPerPage);
   const startIndex = (currentPage - 1) * sessionsPerPage;

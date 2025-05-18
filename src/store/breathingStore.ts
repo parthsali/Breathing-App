@@ -66,7 +66,7 @@ const updateScrollbarColors = (primary: string) => {
  * - State modification methods
  * - Theme synchronization with UI elements
  */
-export const useBreathingStore = create<BreathingState>((set, get) => ({
+export const useBreathingStore = create<BreathingState>((set, _) => ({
   inhaleTime: 4,
   holdTime: 4,
   exhaleTime: 6,
