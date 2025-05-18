@@ -26,7 +26,7 @@ A beautiful, interactive breathing exercise application with 3D visualization an
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/parthsali/breathing-app.git
+git clone https://github.com/parthsali/Breathing-App.git
 cd breathing-app
 ```
 
