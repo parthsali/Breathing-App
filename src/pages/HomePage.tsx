@@ -52,17 +52,54 @@ const BUTTON_STYLES = {
     border: `1px solid ${theme}40`,
     boxShadow: `0 4px 14px ${theme}40`,
     color: theme
+  }),
+  help: (theme: string) => ({
+    background: `${theme}40`,
+    border: `1px solid ${theme}40`,
+    boxShadow: `0 4px 14px ${theme}40`,
+    color: theme
   })
 } as const;
+
+const HELP_INSTRUCTIONS = [
+  {
+    title: "Getting Started",
+    steps: [
+      "Choose a breathing pattern from the left panel",
+      "Click 'Start Breathing' to begin your session",
+      "Follow the sphere's rhythm - expand on inhale, hold, and contract on exhale"
+    ]
+  },
+  {
+    title: "During Session",
+    steps: [
+      "Focus on the breathing sphere's movement",
+      "Timer shows your session duration",
+      "Pattern controls are locked during active sessions"
+    ]
+  },
+  {
+    title: "Tracking Progress",
+    steps: [
+      "View your breathing history in Stats",
+      "Check patterns used and session durations",
+      "Monitor your progress over time"
+    ]
+  }
+] as const;
 
 /**
  * HomePage component that renders the main breathing exercise interface
  * @returns {JSX.Element} The rendered application
  */
 const HomePage: React.FC = () => {
-  const { theme } = useBreathingStore();
+  const { theme, isBreathing } = useBreathingStore();
   const navigate = useNavigate();
   const [isCountdownVisible, setIsCountdownVisible] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
+
+  // Determine if buttons should be disabled
+  const isButtonsDisabled = isCountdownVisible || isBreathing;
 
   return (
     <div 
@@ -88,30 +125,92 @@ const HomePage: React.FC = () => {
       <StartButton onCountdownStart={() => setIsCountdownVisible(true)} onCountdownEnd={() => setIsCountdownVisible(false)} />
       <BreathingTimer />
       <div className="absolute bottom-6 right-6 flex gap-4">
-      <button
+        <button
+          onClick={() => setShowHelp(true)}
+          className={`${BUTTON_STYLES.base}`}
+          style={{
+            ...BUTTON_STYLES.help(theme.primary),
+            filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+            pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+            opacity: isButtonsDisabled ? 0.5 : 1
+          }}
+        >
+          Help
+        </button>
+        <button
           onClick={() => navigate('/stats')}
           className={`${BUTTON_STYLES.base}`}
           style={{
             ...BUTTON_STYLES.stats(theme.primary),
-            filter: isCountdownVisible ? 'blur(8px)' : 'none',
-            pointerEvents: isCountdownVisible ? 'none' : 'auto'
+            filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+            pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+            opacity: isButtonsDisabled ? 0.5 : 1
           }}
         >
-          View Stats
+          Stats
         </button>
         <button
           onClick={() => navigate('/about')}
           className={`${BUTTON_STYLES.base}`}
           style={{
             ...BUTTON_STYLES.about(theme.primary),
-            filter: isCountdownVisible ? 'blur(8px)' : 'none',
-            pointerEvents: isCountdownVisible ? 'none' : 'auto'
+            filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+            pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+            opacity: isButtonsDisabled ? 0.5 : 1
           }}
         >
           About
         </button>
-        
       </div>
+
+      {/* Help Popup */}
+      {showHelp && (
+        <div 
+          className="fixed inset-0 flex items-center justify-center z-50"
+          style={{ backdropFilter: 'blur(8px)' }}
+          onClick={() => setShowHelp(false)}
+        >
+          <div 
+            className="w-96 p-6 rounded-2xl transform transition-all duration-300"
+            style={{ 
+              background: `${theme.background}ee`,
+              border: `2px solid ${theme.primary}40`,
+              boxShadow: `0 8px 32px ${theme.primary}40`
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold" style={{ color: theme.primary }}>How to Use</h2>
+              <button 
+                onClick={() => setShowHelp(false)}
+                className="text-sm opacity-60 hover:opacity-100 transition-opacity"
+                style={{ color: theme.primary }}
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-6">
+              {HELP_INSTRUCTIONS.map((section, index) => (
+                <div key={index} className="space-y-2">
+                  <h3 className="font-medium" style={{ color: theme.primary }}>{section.title}</h3>
+                  <ul className="space-y-1.5">
+                    {section.steps.map((step, stepIndex) => (
+                      <li 
+                        key={stepIndex} 
+                        className="text-sm opacity-80 flex items-start"
+                        style={{ color: theme.primary }}
+                      >
+                        <span className="mr-2 mt-0.5">•</span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
