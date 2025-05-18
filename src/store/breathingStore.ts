@@ -23,7 +23,18 @@ interface BreathingState {
   setElapsedTime: (time: number) => void;
 }
 
-export const useBreathingStore = create<BreathingState>((set) => ({
+const updateScrollbarColors = (primary: string) => {
+  const root = document.documentElement;
+  const primaryColor = primary.replace('#', '');
+  const r = parseInt(primaryColor.slice(0, 2), 16);
+  const g = parseInt(primaryColor.slice(2, 4), 16);
+  const b = parseInt(primaryColor.slice(4, 6), 16);
+  
+  root.style.setProperty('--scrollbar-thumb', `rgba(${r}, ${g}, ${b}, 0.5)`);
+  root.style.setProperty('--scrollbar-thumb-hover', `rgba(${r}, ${g}, ${b}, 0.7)`);
+};
+
+export const useBreathingStore = create<BreathingState>((set, get) => ({
   inhaleTime: 4,
   holdTime: 4,
   exhaleTime: 6,
@@ -37,7 +48,10 @@ export const useBreathingStore = create<BreathingState>((set) => ({
   },
   setBreathingPattern: (inhale, hold, exhale) =>
     set({ inhaleTime: inhale, holdTime: hold, exhaleTime: exhale, currentPhase: 'inhale' }),
-  setTheme: (theme) => set({ theme }),
+  setTheme: (theme: { primary: string; secondary: string; background: string }) => {
+    set({ theme });
+    updateScrollbarColors(theme.primary);
+  },
   startBreathing: () => set({ isBreathing: true, currentPhase: 'inhale' }),
   stopBreathing: () => set({ isBreathing: false, currentPhase: 'rest' }),
   setCurrentPhase: (phase) => set({ currentPhase: phase }),

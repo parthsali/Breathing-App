@@ -69,26 +69,27 @@ const BREATHING_PATTERNS = [
 
 const STATS_STYLES = {
   container: "h-screen relative overflow-hidden",
-  content: "relative z-10 max-w-7xl mx-auto px-8 py-6",
-  header: "mb-6 text-center",
+  content: "relative z-10 max-w-7xl mx-auto px-6 py-8",
+  header: "mb-8 text-center relative",
   title: "text-3xl font-bold mb-2",
   subtitle: "text-base opacity-80",
-  backButton: "fixed top-8 left-8 px-6 py-3 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
+  backButton: "fixed top-6 left-6 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
+  clearButton: "fixed top-6 right-6 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
   mainGrid: "grid grid-cols-5 gap-6",
   leftSection: "col-span-3",
   rightSection: "col-span-2",
-  statsGrid: "grid grid-cols-2 gap-3 mb-4",
-  statCard: "text-center p-3 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
-  statValue: "text-xl font-bold mb-1",
-  statLabel: "text-xs opacity-80",
-  sessionList: "space-y-2 mb-3",
-  sessionItem: "p-3 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  statsGrid: "grid grid-cols-2 gap-4 mb-6",
+  statCard: "text-center p-4 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  statValue: "text-2xl font-bold mb-1",
+  statLabel: "text-sm opacity-80",
+  sessionList: "space-y-3",
+  sessionItem: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
   patternName: "text-base font-medium",
   patternDetails: "text-xs opacity-60",
   details: "text-xs opacity-60",
   duration: "text-lg font-bold",
-  emptyState: "text-center py-4 text-sm opacity-60",
-  pagination: "flex justify-center items-center gap-3 py-3 rounded-xl backdrop-blur-lg",
+  emptyState: "text-center py-8 text-sm opacity-60",
+  pagination: "flex justify-center items-center gap-3 py-3 mt-4 rounded-xl backdrop-blur-lg",
   pageButton: "px-3 py-1.5 rounded-full backdrop-blur-lg transition-all duration-300 text-xs transform hover:scale-102",
   pageInfo: "text-xs opacity-80",
   chartCard: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300 mb-4",
@@ -109,6 +110,14 @@ export const StatsPage: React.FC = () => {
       setSessions(JSON.parse(storedSessions));
     }
   }, []);
+
+  const handleClearStats = () => {
+    if (window.confirm('Are you sure you want to clear all your breathing session data? This action cannot be undone.')) {
+      localStorage.removeItem('breathing-sessions');
+      setSessions([]);
+      setCurrentPage(1);
+    }
+  };
 
   const formatDuration = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -161,7 +170,10 @@ export const StatsPage: React.FC = () => {
   }, {} as Record<string, number>);
 
   const durationChartData = {
-    labels: sessions.map(session => formatDate(session.date).date),
+    labels: sessions.map(session => {
+      const { date, time } = formatDate(session.date);
+      return `${date} ${time}`;
+    }),
     datasets: [{
       label: 'Duration (minutes)',
       data: sessionDurations,
@@ -227,7 +239,7 @@ export const StatsPage: React.FC = () => {
           background: `${theme.primary}40`,
           border: `1px solid ${theme.primary}40`,
           boxShadow: `0 4px 14px ${theme.primary}40`,
-          position: "absolute",
+          position: "fixed",
           zIndex: 1000,
           color: theme.primary
         }}
@@ -243,6 +255,20 @@ export const StatsPage: React.FC = () => {
           <p className={STATS_STYLES.subtitle} style={{ color: theme.primary }}>
             Track your progress and find your rhythm
           </p>
+          <button
+            onClick={handleClearStats}
+            className={STATS_STYLES.clearButton}
+            style={{ 
+              background: `${theme.primary}20`,
+              border: `1px solid ${theme.primary}40`,
+              boxShadow: `0 4px 14px ${theme.primary}40`,
+              position: "fixed",
+              zIndex: 1000,
+              color: theme.primary
+            }}
+          >
+            Clear Data
+          </button>
         </div>
 
         <div className={STATS_STYLES.mainGrid}>

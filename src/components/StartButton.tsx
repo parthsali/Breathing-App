@@ -10,7 +10,7 @@ import { InitialCountdown } from './InitialCountdown';
  * Styles for the start/stop button
  */
 const BUTTON_STYLES = {
-  base: "absolute right-8 top-8 px-6 py-3 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105",
+  base: "absolute right-8 top-8 px-5 py-2.5 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105",
   start: (theme: string) => ({
     background: theme,
     boxShadow: `0 4px 14px ${theme}80`
