@@ -21,7 +21,7 @@ interface BreathingState {
 export const useBreathingStore = create<BreathingState>((set) => ({
   inhaleTime: 4,
   holdTime: 4,
-  exhaleTime: 4,
+  exhaleTime: 6,
   isBreathing: false,
   currentPhase: 'rest',
   theme: {
@@ -30,9 +30,9 @@ export const useBreathingStore = create<BreathingState>((set) => ({
     background: '#e0f7fa', // Sky 100
   },
   setBreathingPattern: (inhale, hold, exhale) =>
-    set({ inhaleTime: inhale, holdTime: hold, exhaleTime: exhale }),
+    set({ inhaleTime: inhale, holdTime: hold, exhaleTime: exhale, currentPhase: 'inhale' }),
   setTheme: (theme) => set({ theme }),
-  startBreathing: () => set({ isBreathing: true }),
+  startBreathing: () => set({ isBreathing: true, currentPhase: 'inhale' }),
   stopBreathing: () => set({ isBreathing: false, currentPhase: 'rest' }),
   setCurrentPhase: (phase) => set({ currentPhase: phase }),
 })); 

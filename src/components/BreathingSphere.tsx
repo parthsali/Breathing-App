@@ -2,7 +2,7 @@
  * BreathingSphere component that renders an animated sphere for breathing exercises.
  * The sphere expands and contracts based on the breathing cycle phases.
  */
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial, MeshWobbleMaterial } from '@react-three/drei';
 import { useBreathingStore } from '../store/breathingStore';
@@ -46,6 +46,7 @@ const SPHERE_CONFIG = {
 export const BreathingSphere: React.FC = () => {
   const sphereRef = useRef<THREE.Mesh>(null);
   const outerSphereRef = useRef<THREE.Mesh>(null);
+  const startTime = useRef<number>(0);
   const {
     inhaleTime,
     holdTime,
@@ -59,13 +60,18 @@ export const BreathingSphere: React.FC = () => {
   const totalCycleTime = inhaleTime + holdTime + exhaleTime;
   const scale = useRef(1);
 
-  /**
-   * Updates the sphere's scale and rotation based on the current breathing phase
-   */
+  // Reset startTime when breathing starts
+  useEffect(() => {
+    if (isBreathing) {
+      startTime.current = Date.now();
+    }
+  }, [isBreathing]);
+
   useFrame((state, delta) => {
     if (!isBreathing || !sphereRef.current || !outerSphereRef.current) return;
 
-    const time = state.clock.getElapsedTime() % totalCycleTime;
+    const elapsedTime = (Date.now() - startTime.current) / 1000;
+    const time = elapsedTime % totalCycleTime;
     
     // Calculate scale based on breathing phase
     if (time < inhaleTime) {
