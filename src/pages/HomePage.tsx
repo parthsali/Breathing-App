@@ -11,6 +11,7 @@ import { StartButton } from '../components/StartButton';
 import { BreathingTimer } from '../components/BreathingTimer';
 import { useBreathingStore } from '../store/breathingStore';
 import { useNavigate } from 'react-router-dom';
+import { CustomBreathing } from '../components/CustomBreathing';
 
 /**
  * Scene configuration for the 3D environment
@@ -122,6 +123,7 @@ const HomePage: React.FC = () => {
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
       <Controls />
+      <CustomBreathing />
       <StartButton onCountdownStart={() => setIsCountdownVisible(true)} onCountdownEnd={() => setIsCountdownVisible(false)} />
       <BreathingTimer />
       <div className="absolute bottom-6 right-6 flex gap-4">

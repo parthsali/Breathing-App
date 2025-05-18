@@ -83,7 +83,7 @@ const STATS_STYLES = {
   statValue: "text-2xl font-bold mb-1",
   statLabel: "text-sm opacity-80",
   sessionList: "space-y-3",
-  sessionItem: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  sessionItem: "px-4 py-2 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
   patternName: "text-base font-medium",
   patternDetails: "text-xs opacity-60",
   details: "text-xs opacity-60",

@@ -85,9 +85,9 @@ const BREATHING_PATTERNS: BreathingPattern[] = [
  * Styles for the controls container
  */
 const CONTAINER_STYLES = {
-  base: "fixed left-4 top-4 p-6 w-80 transform transition-all duration-300",
+  base: "fixed left-4 top-4 p-4 w-80 transform transition-all duration-300",
   patternButton: {
-    base: "w-full p-4 rounded-xl transition-all duration-300 transform hover:scale-102",
+    base: "w-full p-3 rounded-xl transition-all duration-300 transform hover:scale-102",
     active: (theme: string) => ({
       background: `${theme}20`,
       border: `2px solid ${theme}`,
@@ -143,24 +143,32 @@ export const Controls: React.FC = () => {
     const phaseText = {
       inhale: `${inhaleTime}s to inhale`,
       hold: `${holdTime}s to hold`,
-      exhale: `${exhaleTime}s to exhale`
+      exhale: `${exhaleTime}s to exhale`,
+      rest: 'Rest'
     }[currentPhase];
 
     return (
       <div 
-        className="text-center py-3 px-4 rounded-lg"
+        className="text-center py-2 px-3 rounded-lg"
         style={{ 
           background: `${theme.primary}20`,
           color: theme.primary
         }}
       >
-        <div className="font-medium mb-1">
+        <div className="font-medium text-sm">
           {currentPhase.charAt(0).toUpperCase() + currentPhase.slice(1)}
         </div>
-        <div className="text-sm opacity-80">{phaseText}</div>
+        <div className="text-xs opacity-80">{phaseText}</div>
       </div>
     );
   };
+
+  // Check if current pattern matches any predefined pattern
+  const isCustomPatternActive = !BREATHING_PATTERNS.some(pattern => 
+    pattern.inhale === inhaleTime && 
+    pattern.hold === holdTime && 
+    pattern.exhale === exhaleTime
+  );
 
   return (
     <div 
@@ -171,14 +179,14 @@ export const Controls: React.FC = () => {
       }}
     >
       <div className="space-y-6">
-        <div className="space-y-3">
+        <div className="space-y-2">
           {BREATHING_PATTERNS.map((pattern) => (
             <button
               key={pattern.name}
               onClick={() => handlePatternSelect(pattern)}
               className={CONTAINER_STYLES.patternButton.base}
               style={{
-                ...(theme.primary === pattern.theme.primary
+                ...(theme.primary === pattern.theme.primary && !isCustomPatternActive
                   ? CONTAINER_STYLES.patternButton.active(pattern.theme.primary)
                   : CONTAINER_STYLES.patternButton.inactive),
                 ...(isBreathing ? CONTAINER_STYLES.patternButton.disabled : {})
@@ -187,8 +195,8 @@ export const Controls: React.FC = () => {
               <div className="flex justify-between items-center">
                 <div className="text-left">
                   <h3 
-                    className="font-semibold mb-1"
-                    style={{ color: theme.primary === pattern.theme.primary 
+                    className="font-semibold mb-0.5"
+                    style={{ color: theme.primary === pattern.theme.primary && !isCustomPatternActive
                       ? pattern.theme.primary 
                       : '#374151' }}
                   >
@@ -196,7 +204,7 @@ export const Controls: React.FC = () => {
                   </h3>
                   <p 
                     className="text-xs opacity-70"
-                    style={{ color: theme.primary === pattern.theme.primary 
+                    style={{ color: theme.primary === pattern.theme.primary && !isCustomPatternActive
                       ? `${pattern.theme.primary}CC`
                       : '#6B7280' }}
                   >
@@ -206,7 +214,7 @@ export const Controls: React.FC = () => {
                 <div className="text-right">
                   <div 
                     className="text-sm font-medium"
-                    style={{ color: theme.primary === pattern.theme.primary 
+                    style={{ color: theme.primary === pattern.theme.primary && !isCustomPatternActive
                       ? pattern.theme.primary 
                       : '#4B5563' }}
                   >
