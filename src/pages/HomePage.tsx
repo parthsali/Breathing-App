@@ -2,7 +2,7 @@
  * HomePage component that renders the breathing exercise interface.
  * This component sets up the 3D scene with Three.js and manages the overall layout.
  */
-import React from 'react';
+import React, { useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { BreathingSphere } from '../components/BreathingSphere';
@@ -42,6 +42,7 @@ const SCENE_CONFIG = {
 const HomePage: React.FC = () => {
   const { theme } = useBreathingStore();
   const navigate = useNavigate();
+  const [isCountdownVisible, setIsCountdownVisible] = useState(false);
 
   return (
     <div 
@@ -64,14 +65,16 @@ const HomePage: React.FC = () => {
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
       <Controls />
-      <StartButton />
+      <StartButton onCountdownStart={() => setIsCountdownVisible(true)} onCountdownEnd={() => setIsCountdownVisible(false)} />
       <BreathingTimer />
       <button
         onClick={() => navigate('/stats')}
         className="absolute bottom-8 right-8 px-4 py-2 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105"
         style={{ 
           background: theme.primary,
-          boxShadow: `0 4px 14px ${theme.primary}80`
+          boxShadow: `0 4px 14px ${theme.primary}80`,
+          filter: isCountdownVisible ? 'blur(8px)' : 'none',
+          pointerEvents: isCountdownVisible ? 'none' : 'auto'
         }}
       >
         View Stats

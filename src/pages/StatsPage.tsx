@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Line } from 'react-chartjs-2';
+import { Line, Doughnut } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -68,29 +68,40 @@ const BREATHING_PATTERNS = [
 ];
 
 const STATS_STYLES = {
-  container: "min-h-screen relative overflow-hidden",
-  content: "relative z-10 max-w-5xl mx-auto px-8 py-12",
-  header: "mb-16 text-center",
-  title: "text-5xl font-bold mb-4",
-  subtitle: "text-xl opacity-80",
-  backButton: "fixed top-8 left-8 px-6 py-3 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg",
-  statsGrid: "grid grid-cols-2 gap-8 mb-16",
-  statCard: "text-center p-8 rounded-2xl backdrop-blur-lg transition-all duration-300",
-  statValue: "text-4xl font-bold mb-2",
-  statLabel: "text-lg opacity-80",
-  sessionList: "space-y-6",
-  sessionItem: "p-6 rounded-2xl backdrop-blur-lg transition-all duration-300",
-  patternName: "text-2xl font-medium mb-2",
-  patternDescription: "text-lg opacity-80 mb-4",
-  details: "text-sm opacity-60",
-  duration: "text-3xl font-bold mt-4",
-  emptyState: "text-center py-16 text-xl opacity-60"
+  container: "h-screen relative overflow-hidden",
+  content: "relative z-10 max-w-7xl mx-auto px-8 py-6",
+  header: "mb-6 text-center",
+  title: "text-3xl font-bold mb-2",
+  subtitle: "text-base opacity-80",
+  backButton: "fixed top-8 left-8 px-6 py-3 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
+  mainGrid: "grid grid-cols-5 gap-6",
+  leftSection: "col-span-3",
+  rightSection: "col-span-2",
+  statsGrid: "grid grid-cols-2 gap-3 mb-4",
+  statCard: "text-center p-3 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  statValue: "text-xl font-bold mb-1",
+  statLabel: "text-xs opacity-80",
+  sessionList: "space-y-2 mb-3",
+  sessionItem: "p-3 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  patternName: "text-base font-medium",
+  patternDetails: "text-xs opacity-60",
+  details: "text-xs opacity-60",
+  duration: "text-lg font-bold",
+  emptyState: "text-center py-4 text-sm opacity-60",
+  pagination: "flex justify-center items-center gap-3 py-3 rounded-xl backdrop-blur-lg",
+  pageButton: "px-3 py-1.5 rounded-full backdrop-blur-lg transition-all duration-300 text-xs transform hover:scale-102",
+  pageInfo: "text-xs opacity-80",
+  chartCard: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300 mb-4",
+  chartTitle: "text-sm font-medium mb-3",
+  chartContainer: "h-40"
 } as const;
 
 export const StatsPage: React.FC = () => {
   const navigate = useNavigate();
   const { theme } = useBreathingStore();
   const [sessions, setSessions] = useState<Session[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const sessionsPerPage = 4;
 
   useEffect(() => {
     const storedSessions = localStorage.getItem('breathing-sessions');
@@ -106,11 +117,18 @@ export const StatsPage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    const date = new Date(dateString);
+    return {
+      date: date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      }),
+      time: date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      })
+    };
   };
 
   const getPatternInfo = (inhale: number, hold: number, exhale: number) => {
@@ -128,6 +146,75 @@ export const StatsPage: React.FC = () => {
   const totalDuration = sessions.reduce((acc, session) => acc + session.duration, 0);
   const averageDuration = totalSessions > 0 ? Math.round(totalDuration / totalSessions / 60) : 0;
 
+  // Pagination calculations
+  const totalPages = Math.ceil(sessions.length / sessionsPerPage);
+  const startIndex = (currentPage - 1) * sessionsPerPage;
+  const endIndex = startIndex + sessionsPerPage;
+  const currentSessions = sessions.slice(startIndex, endIndex);
+
+  // Prepare chart data
+  const sessionDurations = sessions.map(session => session.duration / 60);
+  const patternUsage = sessions.reduce((acc, session) => {
+    const pattern = getPatternInfo(session.inhaleTime, session.holdTime, session.exhaleTime).name;
+    acc[pattern] = (acc[pattern] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const durationChartData = {
+    labels: sessions.map(session => formatDate(session.date).date),
+    datasets: [{
+      label: 'Duration (minutes)',
+      data: sessionDurations,
+      borderColor: theme.primary,
+      backgroundColor: `${theme.primary}20`,
+      tension: 0.4,
+      fill: true
+    }]
+  };
+
+  const patternChartData = {
+    labels: Object.keys(patternUsage),
+    datasets: [{
+      data: Object.values(patternUsage),
+      backgroundColor: [
+        `${theme.primary}80`,
+        `${theme.primary}60`,
+        `${theme.primary}40`,
+        `${theme.primary}20`
+      ],
+      borderWidth: 0
+    }]
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          display: false
+        },
+        ticks: {
+          display: false
+        }
+      },
+      x: {
+        grid: {
+          display: false
+        },
+        ticks: {
+          display: false
+        }
+      }
+    }
+  };
+
   return (
     <div 
       className={STATS_STYLES.container}
@@ -138,7 +225,11 @@ export const StatsPage: React.FC = () => {
         className={STATS_STYLES.backButton}
         style={{ 
           background: `${theme.primary}40`,
-          border: `1px solid ${theme.primary}40`
+          border: `1px solid ${theme.primary}40`,
+          boxShadow: `0 4px 14px ${theme.primary}40`,
+          position: "absolute",
+          zIndex: 1000,
+          color: theme.primary
         }}
       >
         ← Back
@@ -154,72 +245,166 @@ export const StatsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className={STATS_STYLES.statsGrid}>
-          <div 
-            className={STATS_STYLES.statCard}
-            style={{ 
-              background: `${theme.primary}20`,
-              border: `1px solid ${theme.primary}40`
-            }}
-          >
-            <div className={STATS_STYLES.statValue} style={{ color: theme.primary }}>
-              {totalSessions}
-            </div>
-            <div className={STATS_STYLES.statLabel} style={{ color: theme.primary }}>
-              Sessions Completed
-            </div>
-          </div>
-
-          <div 
-            className={STATS_STYLES.statCard}
-            style={{ 
-              background: `${theme.primary}20`,
-              border: `1px solid ${theme.primary}40`
-            }}
-          >
-            <div className={STATS_STYLES.statValue} style={{ color: theme.primary }}>
-              {formatDuration(totalDuration)}
-            </div>
-            <div className={STATS_STYLES.statLabel} style={{ color: theme.primary }}>
-              Total Breathing Time
-            </div>
-          </div>
-        </div>
-
-        <div className={STATS_STYLES.sessionList}>
-          {sessions.length > 0 ? (
-            sessions.slice(0, 5).map((session) => {
-              const patternInfo = getPatternInfo(session.inhaleTime, session.holdTime, session.exhaleTime);
-              return (
-                <div 
-                  key={session.id} 
-                  className={STATS_STYLES.sessionItem}
-                  style={{ 
-                    background: `${theme.primary}20`,
-                    border: `1px solid ${theme.primary}40`
-                  }}
-                >
-                  <div className={STATS_STYLES.patternName} style={{ color: theme.primary }}>
-                    {patternInfo.name}
-                  </div>
-                  <div className={STATS_STYLES.patternDescription} style={{ color: theme.primary }}>
-                    {patternInfo.description}
-                  </div>
-                  <div className={STATS_STYLES.details} style={{ color: theme.primary }}>
-                    {formatDate(session.date)}
-                  </div>
-                  <div className={STATS_STYLES.duration} style={{ color: theme.primary }}>
-                    {formatDuration(session.duration)}
-                  </div>
+        <div className={STATS_STYLES.mainGrid}>
+          <div className={STATS_STYLES.leftSection}>
+            <div className={STATS_STYLES.statsGrid}>
+              <div 
+                className={STATS_STYLES.statCard}
+                style={{ 
+                  background: `${theme.primary}20`,
+                  border: `2px solid ${theme.primary}40`,
+                  boxShadow: `0 4px 14px ${theme.primary}40`
+                }}
+              >
+                <div className={STATS_STYLES.statValue} style={{ color: theme.primary }}>
+                  {totalSessions}
                 </div>
-              );
-            })
-          ) : (
-            <div className={STATS_STYLES.emptyState} style={{ color: theme.primary }}>
-              <p>No sessions recorded yet.</p>
-              <p className="mt-2">Start your breathing journey to see your progress here.</p>
+                <div className={STATS_STYLES.statLabel} style={{ color: theme.primary }}>
+                  Sessions
+                </div>
+              </div>
+
+              <div 
+                className={STATS_STYLES.statCard}
+                style={{ 
+                  background: `${theme.primary}20`,
+                  border: `2px solid ${theme.primary}40`,
+                  boxShadow: `0 4px 14px ${theme.primary}40`
+                }}
+              >
+                <div className={STATS_STYLES.statValue} style={{ color: theme.primary }}>
+                  {formatDuration(totalDuration)}
+                </div>
+                <div className={STATS_STYLES.statLabel} style={{ color: theme.primary }}>
+                  Total Time
+                </div>
+              </div>
             </div>
-          )}
+
+            <div className={STATS_STYLES.sessionList}>
+              {currentSessions.length > 0 ? (
+                <>
+                  {currentSessions.map((session) => {
+                    const patternInfo = getPatternInfo(session.inhaleTime, session.holdTime, session.exhaleTime);
+                    const { date, time } = formatDate(session.date);
+                    return (
+                      <div 
+                        key={session.id} 
+                        className={STATS_STYLES.sessionItem}
+                        style={{ 
+                          background: `${theme.primary}20`,
+                          border: `2px solid ${theme.primary}40`,
+                          boxShadow: `0 4px 14px ${theme.primary}40`
+                        }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <div className={STATS_STYLES.patternName} style={{ color: theme.primary }}>
+                                {patternInfo.name}
+                              </div>
+                              <div className={STATS_STYLES.patternDetails} style={{ color: theme.primary }}>
+                                ({session.inhaleTime}-{session.holdTime}-{session.exhaleTime})
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className={STATS_STYLES.duration} style={{ color: theme.primary }}>
+                              {formatDuration(session.duration)}
+                            </div>
+                            <div className={STATS_STYLES.details} style={{ color: theme.primary }}>
+                              {date} {time}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {totalPages > 1 && (
+                    <div 
+                      className={STATS_STYLES.pagination}
+                      style={{ 
+                        background: `${theme.primary}20`,
+                        border: `2px solid ${theme.primary}40`,
+                        boxShadow: `0 4px 14px ${theme.primary}40`
+                      }}
+                    >
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        className={STATS_STYLES.pageButton}
+                        style={{ 
+                          background: `${theme.primary}20`,
+                          border: `2px solid ${theme.primary}40`,
+                          color: theme.primary,
+                          opacity: currentPage === 1 ? 0.5 : 1,
+                          boxShadow: `0 4px 14px ${theme.primary}40`
+                        }}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </button>
+                      <span className={STATS_STYLES.pageInfo} style={{ color: theme.primary }}>
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        className={STATS_STYLES.pageButton}
+                        style={{ 
+                          background: `${theme.primary}20`,
+                          border: `2px solid ${theme.primary}40`,
+                          color: theme.primary,
+                          opacity: currentPage === totalPages ? 0.5 : 1,
+                          boxShadow: `0 4px 14px ${theme.primary}40`
+                        }}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className={STATS_STYLES.emptyState} style={{ color: theme.primary }}>
+                  <p>No sessions recorded yet.</p>
+                  <p className="mt-1">Start your breathing journey to see your progress here.</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className={STATS_STYLES.rightSection}>
+            <div 
+              className={STATS_STYLES.chartCard}
+              style={{ 
+                background: `${theme.primary}20`,
+                border: `2px solid ${theme.primary}40`,
+                boxShadow: `0 4px 14px ${theme.primary}40`
+              }}
+            >
+              <div className={STATS_STYLES.chartTitle} style={{ color: theme.primary }}>
+                Session Duration Trend
+              </div>
+              <div className={STATS_STYLES.chartContainer}>
+                <Line data={durationChartData} options={chartOptions} />
+              </div>
+            </div>
+
+            <div 
+              className={STATS_STYLES.chartCard}
+              style={{ 
+                background: `${theme.primary}20`,
+                border: `2px solid ${theme.primary}40`,
+                boxShadow: `0 4px 14px ${theme.primary}40`
+              }}
+            >
+              <div className={STATS_STYLES.chartTitle} style={{ color: theme.primary }}>
+                Pattern Usage
+              </div>
+              <div className={STATS_STYLES.chartContainer}>
+                <Doughnut data={patternChartData} options={chartOptions} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

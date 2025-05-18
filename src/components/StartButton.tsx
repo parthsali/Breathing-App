@@ -34,11 +34,16 @@ interface Session {
   exhaleTime: number;
 }
 
+interface StartButtonProps {
+  onCountdownStart?: () => void;
+  onCountdownEnd?: () => void;
+}
+
 /**
  * StartButton component that controls the breathing exercise session
  * @returns {JSX.Element} The rendered start/stop button
  */
-export const StartButton: React.FC = () => {
+export const StartButton: React.FC<StartButtonProps> = ({ onCountdownStart, onCountdownEnd }) => {
   const { isBreathing, theme, startBreathing, stopBreathing, inhaleTime, holdTime, exhaleTime, elapsedTime } = useBreathingStore();
   const [showInitialCountdown, setShowInitialCountdown] = useState(false);
 
@@ -46,14 +51,16 @@ export const StartButton: React.FC = () => {
   useEffect(() => {
     if (isBreathing) {
       setShowInitialCountdown(false);
+      onCountdownEnd?.();
     }
-  }, [isBreathing]);
+  }, [isBreathing, onCountdownEnd]);
 
   /**
    * Handles the start button click by showing the initial countdown
    */
   const handleStart = () => {
     setShowInitialCountdown(true);
+    onCountdownStart?.();
   };
 
   /**
