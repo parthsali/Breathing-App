@@ -47,6 +47,8 @@ export const BreathingSphere: React.FC = () => {
   const sphereRef = useRef<THREE.Mesh>(null);
   const outerSphereRef = useRef<THREE.Mesh>(null);
   const startTime = useRef<number>(0);
+  const isResetting = useRef(false);
+  const resetStartTime = useRef(0);
   const {
     inhaleTime,
     holdTime,
@@ -60,15 +62,45 @@ export const BreathingSphere: React.FC = () => {
   const totalCycleTime = inhaleTime + holdTime + exhaleTime;
   const scale = useRef(1);
 
-  // Reset startTime when breathing starts
+  // Reset startTime when breathing starts and initiate smooth reset when breathing stops
   useEffect(() => {
     if (isBreathing) {
       startTime.current = Date.now();
+      isResetting.current = false;
+    } else if (sphereRef.current && outerSphereRef.current) {
+      // Start smooth reset animation
+      isResetting.current = true;
+      resetStartTime.current = Date.now();
     }
   }, [isBreathing]);
 
   useFrame((state, delta) => {
-    if (!isBreathing || !sphereRef.current || !outerSphereRef.current) return;
+    if (!sphereRef.current || !outerSphereRef.current) return;
+
+    if (isResetting.current) {
+      // Smooth reset animation
+      const resetElapsed = (Date.now() - resetStartTime.current) / 1000;
+      const resetDuration = 0.5; // Half second reset animation
+      const resetProgress = Math.min(resetElapsed / resetDuration, 1);
+      
+      // Smoothly interpolate scale back to 1
+      scale.current = THREE.MathUtils.lerp(scale.current, 1, resetProgress);
+      
+      // Apply transformations
+      sphereRef.current.scale.set(scale.current, scale.current, scale.current);
+      outerSphereRef.current.scale.set(
+        scale.current * SPHERE_CONFIG.outer.scale,
+        scale.current * SPHERE_CONFIG.outer.scale,
+        scale.current * SPHERE_CONFIG.outer.scale
+      );
+
+      if (resetProgress === 1) {
+        isResetting.current = false;
+      }
+      return;
+    }
+
+    if (!isBreathing) return;
 
     const elapsedTime = (Date.now() - startTime.current) / 1000;
     const time = elapsedTime % totalCycleTime;

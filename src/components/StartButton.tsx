@@ -2,7 +2,7 @@
  * StartButton component that controls the breathing exercise session.
  * Provides a button to start/stop the breathing exercise and manages the initial countdown.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
 import { InitialCountdown } from './InitialCountdown';
 
@@ -28,6 +28,13 @@ const BUTTON_STYLES = {
 export const StartButton: React.FC = () => {
   const { isBreathing, theme, startBreathing, stopBreathing } = useBreathingStore();
   const [showInitialCountdown, setShowInitialCountdown] = useState(false);
+
+  // Reset countdown state when breathing starts
+  useEffect(() => {
+    if (isBreathing) {
+      setShowInitialCountdown(false);
+    }
+  }, [isBreathing]);
 
   /**
    * Handles the start button click by showing the initial countdown
