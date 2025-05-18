@@ -12,6 +12,7 @@ import {
   Legend,
   ArcElement,
 } from 'chart.js';
+import { useBreathingStore } from '../store/breathingStore';
 
 ChartJS.register(
   CategoryScale,
@@ -34,24 +35,61 @@ interface Session {
   exhaleTime: number;
 }
 
+// List of patterns with their specific colors and descriptions
+const BREATHING_PATTERNS = [
+  {
+    name: 'Calm',
+    inhale: 4,
+    hold: 4,
+    exhale: 6,
+    description: 'Perfect for relaxation and stress relief'
+  },
+  {
+    name: 'Focus',
+    inhale: 4,
+    hold: 7,
+    exhale: 8,
+    description: 'Enhances concentration and mental clarity'
+  },
+  {
+    name: 'Balance',
+    inhale: 4,
+    hold: 4,
+    exhale: 4,
+    description: 'Promotes emotional balance and stability'
+  },
+  {
+    name: 'Deep',
+    inhale: 6,
+    hold: 2,
+    exhale: 7,
+    description: 'Deep breathing for energy and vitality'
+  }
+];
+
 const STATS_STYLES = {
-  container: "min-h-screen bg-gray-50 p-8",
-  header: "max-w-7xl mx-auto mb-8",
-  title: "text-3xl font-bold text-gray-900",
-  backButton: "mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700",
-  grid: "max-w-7xl mx-auto grid grid-cols-1 gap-8 lg:grid-cols-2",
-  card: "bg-white rounded-lg shadow-lg p-6",
-  cardTitle: "text-xl font-semibold text-gray-900 mb-4",
-  sessionList: "space-y-4",
-  sessionItem: "bg-white rounded-lg shadow p-4 hover:shadow-md transition-shadow",
-  patternName: "text-lg font-medium text-gray-900",
-  details: "text-sm text-gray-500 mt-2",
-  duration: "text-2xl font-bold text-indigo-600 mt-2",
-  emptyState: "text-center py-12 text-gray-500"
+  container: "min-h-screen relative overflow-hidden",
+  content: "relative z-10 max-w-5xl mx-auto px-8 py-12",
+  header: "mb-16 text-center",
+  title: "text-5xl font-bold mb-4",
+  subtitle: "text-xl opacity-80",
+  backButton: "fixed top-8 left-8 px-6 py-3 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg",
+  statsGrid: "grid grid-cols-2 gap-8 mb-16",
+  statCard: "text-center p-8 rounded-2xl backdrop-blur-lg transition-all duration-300",
+  statValue: "text-4xl font-bold mb-2",
+  statLabel: "text-lg opacity-80",
+  sessionList: "space-y-6",
+  sessionItem: "p-6 rounded-2xl backdrop-blur-lg transition-all duration-300",
+  patternName: "text-2xl font-medium mb-2",
+  patternDescription: "text-lg opacity-80 mb-4",
+  details: "text-sm opacity-60",
+  duration: "text-3xl font-bold mt-4",
+  emptyState: "text-center py-16 text-xl opacity-60"
 } as const;
 
 export const StatsPage: React.FC = () => {
   const navigate = useNavigate();
+  const { theme } = useBreathingStore();
   const [sessions, setSessions] = useState<Session[]>([]);
 
   useEffect(() => {
@@ -71,131 +109,117 @@ export const StatsPage: React.FC = () => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric'
     });
   };
 
-  const chartData = {
-    labels: sessions.map(session => formatDate(session.date)),
-    datasets: [
-      {
-        label: 'Session Duration (minutes)',
-        data: sessions.map(session => session.duration / 60),
-        borderColor: 'rgb(79, 70, 229)',
-        backgroundColor: 'rgba(79, 70, 229, 0.5)',
-        tension: 0.4
-      }
-    ]
+  const getPatternInfo = (inhale: number, hold: number, exhale: number) => {
+    const pattern = BREATHING_PATTERNS.find(
+      p => p.inhale === inhale && p.hold === hold && p.exhale === exhale
+    );
+    return pattern || {
+      name: `${inhale}-${hold}-${exhale}`,
+      description: 'Custom breathing pattern'
+    };
   };
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: 'Session Duration Over Time'
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: 'Duration (minutes)'
-        }
-      }
-    }
-  };
-
-  const patternStats = sessions.reduce((acc, session) => {
-    acc[session.pattern] = (acc[session.pattern] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const patternChartData = {
-    labels: Object.keys(patternStats),
-    datasets: [
-      {
-        data: Object.values(patternStats),
-        backgroundColor: [
-          'rgba(79, 70, 229, 0.8)',
-          'rgba(16, 185, 129, 0.8)',
-          'rgba(245, 158, 11, 0.8)',
-          'rgba(239, 68, 68, 0.8)'
-        ]
-      }
-    ]
-  };
+  // Calculate statistics
+  const totalSessions = sessions.length;
+  const totalDuration = sessions.reduce((acc, session) => acc + session.duration, 0);
+  const averageDuration = totalSessions > 0 ? Math.round(totalDuration / totalSessions / 60) : 0;
 
   return (
-    <div className={STATS_STYLES.container}>
-      <div className={STATS_STYLES.header}>
-        <h1 className={STATS_STYLES.title}>Breathing Session Statistics</h1>
-        <button
-          onClick={() => navigate('/')}
-          className={STATS_STYLES.backButton}
-        >
-          Back to Breathing Exercise
-        </button>
-      </div>
+    <div 
+      className={STATS_STYLES.container}
+      style={{ background: theme.background }}
+    >
+      <button
+        onClick={() => navigate('/')}
+        className={STATS_STYLES.backButton}
+        style={{ 
+          background: `${theme.primary}40`,
+          border: `1px solid ${theme.primary}40`
+        }}
+      >
+        ← Back
+      </button>
 
-      <div className={STATS_STYLES.grid}>
-        <div className={STATS_STYLES.card}>
-          <h2 className={STATS_STYLES.cardTitle}>Session Duration Trend</h2>
-          {sessions.length > 0 ? (
-            <Line data={chartData} options={chartOptions} />
-          ) : (
-            <div className={STATS_STYLES.emptyState}>
-              No session data available yet
-            </div>
-          )}
+      <div className={STATS_STYLES.content}>
+        <div className={STATS_STYLES.header}>
+          <h1 className={STATS_STYLES.title} style={{ color: theme.primary }}>
+            Your Breathing Journey
+          </h1>
+          <p className={STATS_STYLES.subtitle} style={{ color: theme.primary }}>
+            Track your progress and find your rhythm
+          </p>
         </div>
 
-        <div className={STATS_STYLES.card}>
-          <h2 className={STATS_STYLES.cardTitle}>Pattern Usage</h2>
-          {sessions.length > 0 ? (
-            <div className="h-64">
-              <Line data={patternChartData} options={chartOptions} />
+        <div className={STATS_STYLES.statsGrid}>
+          <div 
+            className={STATS_STYLES.statCard}
+            style={{ 
+              background: `${theme.primary}20`,
+              border: `1px solid ${theme.primary}40`
+            }}
+          >
+            <div className={STATS_STYLES.statValue} style={{ color: theme.primary }}>
+              {totalSessions}
             </div>
-          ) : (
-            <div className={STATS_STYLES.emptyState}>
-              No pattern data available yet
+            <div className={STATS_STYLES.statLabel} style={{ color: theme.primary }}>
+              Sessions Completed
             </div>
-          )}
-        </div>
-
-        <div className="lg:col-span-2">
-          <div className={STATS_STYLES.card}>
-            <h2 className={STATS_STYLES.cardTitle}>Session History</h2>
-            {sessions.length > 0 ? (
-              <div className={STATS_STYLES.sessionList}>
-                {sessions.map((session) => (
-                  <div key={session.id} className={STATS_STYLES.sessionItem}>
-                    <div className={STATS_STYLES.patternName}>
-                      {session.pattern}
-                    </div>
-                    <div className={STATS_STYLES.details}>
-                      <p>Pattern: {session.inhaleTime}-{session.holdTime}-{session.exhaleTime}</p>
-                      <p>Date: {formatDate(session.date)}</p>
-                    </div>
-                    <div className={STATS_STYLES.duration}>
-                      {formatDuration(session.duration)}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className={STATS_STYLES.emptyState}>
-                <p>No sessions recorded yet.</p>
-                <p className="text-sm mt-2">Complete a breathing session to see your stats here.</p>
-              </div>
-            )}
           </div>
+
+          <div 
+            className={STATS_STYLES.statCard}
+            style={{ 
+              background: `${theme.primary}20`,
+              border: `1px solid ${theme.primary}40`
+            }}
+          >
+            <div className={STATS_STYLES.statValue} style={{ color: theme.primary }}>
+              {formatDuration(totalDuration)}
+            </div>
+            <div className={STATS_STYLES.statLabel} style={{ color: theme.primary }}>
+              Total Breathing Time
+            </div>
+          </div>
+        </div>
+
+        <div className={STATS_STYLES.sessionList}>
+          {sessions.length > 0 ? (
+            sessions.slice(0, 5).map((session) => {
+              const patternInfo = getPatternInfo(session.inhaleTime, session.holdTime, session.exhaleTime);
+              return (
+                <div 
+                  key={session.id} 
+                  className={STATS_STYLES.sessionItem}
+                  style={{ 
+                    background: `${theme.primary}20`,
+                    border: `1px solid ${theme.primary}40`
+                  }}
+                >
+                  <div className={STATS_STYLES.patternName} style={{ color: theme.primary }}>
+                    {patternInfo.name}
+                  </div>
+                  <div className={STATS_STYLES.patternDescription} style={{ color: theme.primary }}>
+                    {patternInfo.description}
+                  </div>
+                  <div className={STATS_STYLES.details} style={{ color: theme.primary }}>
+                    {formatDate(session.date)}
+                  </div>
+                  <div className={STATS_STYLES.duration} style={{ color: theme.primary }}>
+                    {formatDuration(session.duration)}
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className={STATS_STYLES.emptyState} style={{ color: theme.primary }}>
+              <p>No sessions recorded yet.</p>
+              <p className="mt-2">Start your breathing journey to see your progress here.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

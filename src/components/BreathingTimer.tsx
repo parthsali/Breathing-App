@@ -46,8 +46,7 @@ const TIMER_STYLES = {
  * @returns {JSX.Element | null} The rendered timer or null if not breathing
  */
 export const BreathingTimer: React.FC = () => {
-  const { isBreathing, inhaleTime, holdTime, exhaleTime, theme } = useBreathingStore();
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const { isBreathing, inhaleTime, holdTime, exhaleTime, theme, elapsedTime, setElapsedTime } = useBreathingStore();
 
   useEffect(() => {
     if (!isBreathing) {
@@ -55,10 +54,10 @@ export const BreathingTimer: React.FC = () => {
       return;
     }
     const timer = setInterval(() => {
-      setElapsedTime(prev => prev + 1);
+      setElapsedTime(elapsedTime + 1);
     }, 1000);
     return () => clearInterval(timer);
-  }, [isBreathing]);
+  }, [isBreathing, setElapsedTime, elapsedTime]);
 
   if (!isBreathing) return null;
 
