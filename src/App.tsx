@@ -1,70 +1,23 @@
 /**
- * Main application component that renders the breathing exercise interface.
- * This component sets up the 3D scene with Three.js and manages the overall layout.
+ * Main application component that sets up routing and renders the appropriate pages.
  */
 import React from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Stars } from '@react-three/drei';
-import { BreathingSphere } from './components/BreathingSphere';
-import { Controls } from './components/Controls';
-import { StartButton } from './components/StartButton';
-import { BreathingTimer } from './components/BreathingTimer';
-import { useBreathingStore } from './store/breathingStore';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import { StatsPage } from './pages/StatsPage';
 
 /**
- * Scene configuration for the 3D environment
- */
-const SCENE_CONFIG = {
-  camera: {
-    position: [0, 0, 5] as [number, number, number],
-    fov: 75
-  },
-  fog: {
-    near: 5,
-    far: 20
-  },
-  stars: {
-    radius: 100,
-    depth: 50,
-    count: 5000,
-    factor: 4,
-    saturation: 0,
-    fade: true,
-    speed: 1
-  }
-} as const;
-
-/**
- * App component that renders the main breathing exercise interface
- * @returns {JSX.Element} The rendered application
+ * App component that sets up the application routing
+ * @returns {JSX.Element} The rendered application with routing
  */
 const App: React.FC = () => {
-  const { theme } = useBreathingStore();
-
   return (
-    <div 
-      className="w-screen h-screen relative overflow-hidden" 
-      style={{ background: theme.background }}
-    >
-      <Canvas 
-        camera={SCENE_CONFIG.camera}
-        className="absolute inset-0"
-      >
-        <color attach="background" args={[theme.background]} />
-        <fog 
-          attach="fog" 
-          args={[theme.background, SCENE_CONFIG.fog.near, SCENE_CONFIG.fog.far]} 
-        />
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <Stars {...SCENE_CONFIG.stars} />
-        <BreathingSphere />
-        <OrbitControls enableZoom={false} enablePan={false} />
-      </Canvas>
-      <Controls />
-      <StartButton />
-      <BreathingTimer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/stats" element={<StatsPage />} />
+      </Routes>
+    </Router>
   );
 }
 
