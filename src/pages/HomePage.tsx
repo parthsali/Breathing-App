@@ -110,7 +110,7 @@ const HELP_INSTRUCTIONS = [
  * @returns {JSX.Element} The rendered application
  */
 const HomePage: React.FC = () => {
-  const { theme, isBreathing, currentPhase, inhaleTime, holdTime, exhaleTime } = useBreathingStore();
+  const { theme, isBreathing } = useBreathingStore();
   const navigate = useNavigate();
   const [isCountdownVisible, setIsCountdownVisible] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
