@@ -119,16 +119,7 @@ const HomePage: React.FC = () => {
   const isButtonsDisabled = isCountdownVisible || isBreathing;
 
   // Get current phase text
-  const getPhaseText = () => {
-    if (!isBreathing) return '';
-    const phaseText = {
-      inhale: `${inhaleTime}s to inhale`,
-      hold: `${holdTime}s to hold`,
-      exhale: `${exhaleTime}s to exhale`,
-      rest: 'Rest'
-    }[currentPhase];
-    return phaseText;
-  };
+  
 
   return (
     <div 

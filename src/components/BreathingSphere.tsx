@@ -106,7 +106,7 @@ export const BreathingSphere: React.FC = () => {
     }
   }, [isBreathing]);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (!sphereRef.current || !outerSphereRef.current) return;
 
     if (isResetting.current) {
