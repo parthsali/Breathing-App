@@ -68,33 +68,33 @@ const BREATHING_PATTERNS = [
 ];
 
 const STATS_STYLES = {
-  container: "h-screen relative overflow-hidden",
-  content: "relative z-10 max-w-7xl mx-auto px-6 py-8",
-  header: "mb-8 text-center relative",
-  title: "text-3xl font-bold mb-2",
-  subtitle: "text-base opacity-80",
-  backButton: "fixed top-6 left-6 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
-  clearButton: "fixed top-6 right-6 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
-  mainGrid: "grid grid-cols-5 gap-6",
-  leftSection: "col-span-3",
-  rightSection: "col-span-2",
-  statsGrid: "grid grid-cols-2 gap-4 mb-6",
-  statCard: "text-center p-4 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
-  statValue: "text-2xl font-bold mb-1",
-  statLabel: "text-sm opacity-80",
-  sessionList: "space-y-3",
-  sessionItem: "px-4 py-2 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
-  patternName: "text-base font-medium",
+  container: "min-h-screen relative overflow-y-auto",
+  content: "relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-8",
+  header: "mb-6 md:mb-8 text-center relative",
+  title: "text-2xl md:text-3xl font-bold mb-2",
+  subtitle: "text-sm md:text-base opacity-80",
+  backButton: "fixed top-4 md:top-6 left-4 md:left-6 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer z-50",
+  clearButton: "fixed top-4 md:top-6 right-4 md:right-6 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer z-50",
+  mainGrid: "grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 pb-8",
+  leftSection: "col-span-1 md:col-span-3",
+  rightSection: "col-span-1 md:col-span-2",
+  statsGrid: "grid grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6",
+  statCard: "text-center p-3 md:p-4 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  statValue: "text-xl md:text-2xl font-bold mb-1",
+  statLabel: "text-xs md:text-sm opacity-80",
+  sessionList: "space-y-2 md:space-y-3",
+  sessionItem: "px-3 md:px-4 py-2 rounded-xl backdrop-blur-lg transition-all duration-300 transform hover:scale-102",
+  patternName: "text-sm md:text-base font-medium",
   patternDetails: "text-xs opacity-60",
   details: "text-xs opacity-60",
-  duration: "text-lg font-bold",
-  emptyState: "text-center py-8 text-sm opacity-60",
-  pagination: "flex justify-center items-center gap-3 py-3 mt-4 rounded-xl backdrop-blur-lg",
-  pageButton: "px-3 py-1.5 rounded-full backdrop-blur-lg transition-all duration-300 text-xs transform hover:scale-102",
+  duration: "text-base md:text-lg font-bold",
+  emptyState: "text-center py-6 md:py-8 text-sm opacity-60",
+  pagination: "flex justify-center items-center gap-2 md:gap-3 py-2 md:py-3 mt-3 md:mt-4 rounded-xl backdrop-blur-lg",
+  pageButton: "px-2 md:px-3 py-1 md:py-1.5 rounded-full backdrop-blur-lg transition-all duration-300 text-xs transform hover:scale-102",
   pageInfo: "text-xs opacity-80",
-  chartCard: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300 mb-4",
-  chartTitle: "text-sm font-medium mb-3",
-  chartContainer: "h-40"
+  chartCard: "p-3 md:p-4 rounded-xl backdrop-blur-lg transition-all duration-300 mb-3 md:mb-4",
+  chartTitle: "text-sm font-medium mb-2 md:mb-3",
+  chartContainer: "h-32 md:h-40"
 } as const;
 
 export const StatsPage: React.FC = () => {
@@ -231,6 +231,8 @@ export const StatsPage: React.FC = () => {
       className={STATS_STYLES.container}
       style={{ background: theme.background }}
     >
+      <div className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#00000020] to-transparent z-40" />
+      
       <button
         onClick={() => navigate('/')}
         className={STATS_STYLES.backButton}
@@ -238,12 +240,23 @@ export const StatsPage: React.FC = () => {
           background: `${theme.primary}40`,
           border: `1px solid ${theme.primary}40`,
           boxShadow: `0 4px 14px ${theme.primary}40`,
-          position: "fixed",
-          zIndex: 1000,
           color: theme.primary
         }}
       >
         ← Back
+      </button>
+
+      <button
+        onClick={handleClearStats}
+        className={STATS_STYLES.clearButton}
+        style={{ 
+          background: `${theme.primary}20`,
+          border: `1px solid ${theme.primary}40`,
+          boxShadow: `0 4px 14px ${theme.primary}40`,
+          color: theme.primary
+        }}
+      >
+        Clear Data
       </button>
 
       <div className={STATS_STYLES.content}>
@@ -254,20 +267,6 @@ export const StatsPage: React.FC = () => {
           <p className={STATS_STYLES.subtitle} style={{ color: theme.primary }}>
             Track your progress and find your rhythm
           </p>
-          <button
-            onClick={handleClearStats}
-            className={STATS_STYLES.clearButton}
-            style={{ 
-              background: `${theme.primary}20`,
-              border: `1px solid ${theme.primary}40`,
-              boxShadow: `0 4px 14px ${theme.primary}40`,
-              position: "fixed",
-              zIndex: 1000,
-              color: theme.primary
-            }}
-          >
-            Clear Data
-          </button>
         </div>
 
         <div className={STATS_STYLES.mainGrid}>

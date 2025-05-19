@@ -1,10 +1,14 @@
 /**
- * BreathingTimer component that displays the current breathing pattern and timer in the bottom left corner.
+ * BreathingTimer component that displays the current breathing pattern and timer.
  * Features:
- * - Real-time session duration display
- * - Pattern name or timing display
+ * - Real-time session duration tracking
+ * - Pattern name display
+ * - Mobile-responsive positioning
  * - Theme-aware styling
  * - Automatic pattern name detection
+ * 
+ * @component
+ * @returns {JSX.Element | null} The rendered timer or null if not breathing
  */
 import React, { useEffect } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
@@ -49,7 +53,7 @@ const BREATHING_PATTERNS = [
  * - Pattern name display with smaller font
  */
 const TIMER_STYLES = {
-  container: "fixed left-4 bottom-4 p-2 rounded-lg transform transition-all duration-300 min-w-[60px] min-h-[40px] flex flex-col items-center justify-center",
+  container: "fixed left-4 bottom-4 md:left-4 md:bottom-4 p-2 rounded-lg transform transition-all duration-300 min-w-[60px] min-h-[40px] flex flex-col items-center justify-center",
   pattern: "text-xs font-medium mb-0.5 leading-none",
   timer: "text-lg font-bold leading-none"
 } as const;
@@ -96,7 +100,8 @@ export const BreathingTimer: React.FC = () => {
       style={{ 
         background: `${theme.background}99`,
         backdropFilter: 'blur(8px)',
-        border: `2px solid ${theme.primary}40`
+        border: `2px solid ${theme.primary}40`,
+        boxShadow: `0 4px 12px ${theme.primary}20`
       }}
     >
       <div className={TIMER_STYLES.timer} style={{ color: theme.primary }}>{timeText}</div>

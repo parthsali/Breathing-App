@@ -110,13 +110,25 @@ const HELP_INSTRUCTIONS = [
  * @returns {JSX.Element} The rendered application
  */
 const HomePage: React.FC = () => {
-  const { theme, isBreathing } = useBreathingStore();
+  const { theme, isBreathing, currentPhase, inhaleTime, holdTime, exhaleTime } = useBreathingStore();
   const navigate = useNavigate();
   const [isCountdownVisible, setIsCountdownVisible] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
   // Determine if buttons should be disabled
   const isButtonsDisabled = isCountdownVisible || isBreathing;
+
+  // Get current phase text
+  const getPhaseText = () => {
+    if (!isBreathing) return '';
+    const phaseText = {
+      inhale: `${inhaleTime}s to inhale`,
+      hold: `${holdTime}s to hold`,
+      exhale: `${exhaleTime}s to exhale`,
+      rest: 'Rest'
+    }[currentPhase];
+    return phaseText;
+  };
 
   return (
     <div 
@@ -138,47 +150,125 @@ const HomePage: React.FC = () => {
         <BreathingSphere />
         <OrbitControls enableZoom={false} enablePan={false} />
       </Canvas>
-      <Controls />
-      <CustomBreathing />
-      <StartButton onCountdownStart={() => setIsCountdownVisible(true)} onCountdownEnd={() => setIsCountdownVisible(false)} />
-      <BreathingTimer />
-      <div className="absolute bottom-6 right-6 flex gap-4">
-        <button
-          onClick={() => setShowHelp(true)}
-          className={`${BUTTON_STYLES.base}`}
-          style={{
-            ...BUTTON_STYLES.help(theme.primary),
-            filter: isButtonsDisabled ? 'blur(8px)' : 'none',
-            pointerEvents: isButtonsDisabled ? 'none' : 'auto',
-            opacity: isButtonsDisabled ? 0.5 : 1
-          }}
-        >
-          Help
-        </button>
-        <button
-          onClick={() => navigate('/stats')}
-          className={`${BUTTON_STYLES.base}`}
-          style={{
-            ...BUTTON_STYLES.stats(theme.primary),
-            filter: isButtonsDisabled ? 'blur(8px)' : 'none',
-            pointerEvents: isButtonsDisabled ? 'none' : 'auto',
-            opacity: isButtonsDisabled ? 0.5 : 1
-          }}
-        >
-          Stats
-        </button>
-        <button
-          onClick={() => navigate('/about')}
-          className={`${BUTTON_STYLES.base}`}
-          style={{
-            ...BUTTON_STYLES.about(theme.primary),
-            filter: isButtonsDisabled ? 'blur(8px)' : 'none',
-            pointerEvents: isButtonsDisabled ? 'none' : 'auto',
-            opacity: isButtonsDisabled ? 0.5 : 1
-          }}
-        >
-          About
-        </button>
+
+      {/* Mobile Layout */}
+      <div className="md:hidden flex flex-col items-center">
+        {/* Top Bar with Start Button and Controls */}
+        <div className="absolute top-4 px-2 left-0 right-0 flex items-center gap-3 justify-between">
+          <div className="w-[50%]">
+            <Controls />
+          </div>
+          <div className="relative right-0 scale-80 flex items-center gap-2">
+        
+            <StartButton 
+              onCountdownStart={() => setIsCountdownVisible(true)} 
+              onCountdownEnd={() => setIsCountdownVisible(false)} 
+            />
+          </div>
+        </div>
+
+        {/* Breathing Timer - Only visible during breathing */}
+        {isBreathing && (
+          <div className="absolute top-20 left-0 right-0 flex justify-center">
+            <BreathingTimer />
+          </div>
+        )}
+
+        {/* Custom Breathing - Centered above menu */}
+        <div className="absolute bottom-24 w-screen left-0 right-0 flex justify-center">
+          <div className="w-[90%] max-w-[300px] flex justify-center">
+            <CustomBreathing />
+          </div>
+        </div>
+
+        {/* Bottom Menu */}
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-3">
+          <button
+            onClick={() => setShowHelp(true)}
+            className={`${BUTTON_STYLES.base} text-sm px-3 py-1.5`}
+            style={{
+              ...BUTTON_STYLES.help(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            Help
+          </button>
+          <button
+            onClick={() => navigate('/stats')}
+            className={`${BUTTON_STYLES.base} text-sm px-3 py-1.5`}
+            style={{
+              ...BUTTON_STYLES.stats(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            Stats
+          </button>
+          <button
+            onClick={() => navigate('/about')}
+            className={`${BUTTON_STYLES.base} text-sm px-3 py-1.5`}
+            style={{
+              ...BUTTON_STYLES.about(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            About
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden md:block">
+        <Controls />
+        <CustomBreathing />
+        <StartButton 
+          onCountdownStart={() => setIsCountdownVisible(true)} 
+          onCountdownEnd={() => setIsCountdownVisible(false)} 
+        />
+        <BreathingTimer />
+        <div className="absolute bottom-6 right-6 flex gap-4">
+          <button
+            onClick={() => setShowHelp(true)}
+            className={`${BUTTON_STYLES.base}`}
+            style={{
+              ...BUTTON_STYLES.help(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            Help
+          </button>
+          <button
+            onClick={() => navigate('/stats')}
+            className={`${BUTTON_STYLES.base}`}
+            style={{
+              ...BUTTON_STYLES.stats(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            Stats
+          </button>
+          <button
+            onClick={() => navigate('/about')}
+            className={`${BUTTON_STYLES.base}`}
+            style={{
+              ...BUTTON_STYLES.about(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            About
+          </button>
+        </div>
       </div>
 
       {/* Help Popup */}
@@ -189,7 +279,7 @@ const HomePage: React.FC = () => {
           onClick={() => setShowHelp(false)}
         >
           <div 
-            className="w-96 p-6 rounded-2xl transform transition-all duration-300"
+            className="w-[90%] md:w-96 p-4 md:p-6 rounded-2xl transform transition-all duration-300"
             style={{ 
               background: `${theme.background}ee`,
               border: `2px solid ${theme.primary}40`,
@@ -198,7 +288,7 @@ const HomePage: React.FC = () => {
             onClick={e => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold" style={{ color: theme.primary }}>How to Use</h2>
+              <h2 className="text-lg md:text-xl font-bold" style={{ color: theme.primary }}>How to Use</h2>
               <button 
                 onClick={() => setShowHelp(false)}
                 className="text-sm opacity-60 hover:opacity-100 transition-opacity"
@@ -207,15 +297,15 @@ const HomePage: React.FC = () => {
                 ✕
               </button>
             </div>
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {HELP_INSTRUCTIONS.map((section, index) => (
                 <div key={index} className="space-y-2">
-                  <h3 className="font-medium" style={{ color: theme.primary }}>{section.title}</h3>
+                  <h3 className="font-medium text-sm md:text-base" style={{ color: theme.primary }}>{section.title}</h3>
                   <ul className="space-y-1.5">
                     {section.items.map((item, itemIndex) => (
                       <li 
                         key={itemIndex} 
-                        className="text-sm opacity-80 flex items-start"
+                        className="text-xs md:text-sm opacity-80 flex items-start"
                         style={{ color: theme.primary }}
                       >
                         <span className="mr-2 mt-0.5">•</span>

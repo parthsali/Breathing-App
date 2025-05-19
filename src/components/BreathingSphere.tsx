@@ -1,11 +1,16 @@
 /**
  * BreathingSphere component that renders an animated sphere for breathing exercises.
- * The sphere expands and contracts based on the breathing cycle phases.
- * Uses Three.js for 3D rendering and animation, with two layered spheres:
- * - Inner sphere: Main breathing visualization with distortion effect
- * - Outer sphere: Secondary visualization with wobble effect
+ * Features:
+ * - Smooth expansion/contraction based on breathing phases
+ * - Mobile-responsive scaling (max 1.5x on mobile, 2x on desktop)
+ * - Dual-layer sphere with distortion and wobble effects
+ * - Automatic phase transitions
+ * - Smooth reset animation
+ * 
+ * @component
+ * @returns {JSX.Element} The rendered breathing sphere
  */
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Sphere, MeshDistortMaterial, MeshWobbleMaterial } from '@react-three/drei';
 import { useBreathingStore } from '../store/breathingStore';
@@ -55,6 +60,7 @@ const SPHERE_CONFIG = {
  * - Automatic phase transitions (inhale, hold, exhale)
  * - Smooth reset animation when breathing stops
  * - Continuous rotation of outer sphere
+ * - Responsive scale limits for mobile screens
  * 
  * @returns {JSX.Element} The rendered breathing sphere
  */
@@ -64,15 +70,27 @@ export const BreathingSphere: React.FC = () => {
   const startTime = useRef<number>(0);
   const isResetting = useRef(false);
   const resetStartTime = useRef(0);
+  const [isMobile, setIsMobile] = useState(false);
+
   const {
     inhaleTime,
     holdTime,
     exhaleTime,
     isBreathing,
-    
     theme,
     setCurrentPhase,
   } = useBreathingStore();
+
+  // Check if we're on mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const totalCycleTime = inhaleTime + holdTime + exhaleTime;
   const scale = useRef(1);
@@ -83,26 +101,22 @@ export const BreathingSphere: React.FC = () => {
       startTime.current = Date.now();
       isResetting.current = false;
     } else if (sphereRef.current && outerSphereRef.current) {
-      // Start smooth reset animation
       isResetting.current = true;
       resetStartTime.current = Date.now();
     }
   }, [isBreathing]);
 
   useFrame((state, delta) => {
-    console.log(state)
     if (!sphereRef.current || !outerSphereRef.current) return;
 
     if (isResetting.current) {
       // Smooth reset animation
       const resetElapsed = (Date.now() - resetStartTime.current) / 1000;
-      const resetDuration = 0.5; // Half second reset animation
+      const resetDuration = 0.5;
       const resetProgress = Math.min(resetElapsed / resetDuration, 1);
       
-      // Smoothly interpolate scale back to 1
       scale.current = THREE.MathUtils.lerp(scale.current, 1, resetProgress);
       
-      // Apply transformations
       sphereRef.current.scale.set(scale.current, scale.current, scale.current);
       outerSphereRef.current.scale.set(
         scale.current * SPHERE_CONFIG.outer.scale,
@@ -121,19 +135,24 @@ export const BreathingSphere: React.FC = () => {
     const elapsedTime = (Date.now() - startTime.current) / 1000;
     const time = elapsedTime % totalCycleTime;
     
-    // Calculate scale based on breathing phase
+    // Calculate scale based on breathing phase with mobile limit
+    let targetScale = 1;
     if (time < inhaleTime) {
       setCurrentPhase('inhale');
       const progress = time / inhaleTime;
-      scale.current = 1 + progress;
+      targetScale = 1 + progress;
     } else if (time < inhaleTime + holdTime) {
       setCurrentPhase('hold');
-      scale.current = 2;
+      targetScale = 2;
     } else {
       setCurrentPhase('exhale');
       const progress = (time - (inhaleTime + holdTime)) / exhaleTime;
-      scale.current = 2 - progress;
+      targetScale = 2 - progress;
     }
+
+    // Apply mobile scale limit
+    const maxScale = isMobile ? 1.5 : 2; // Limit expansion on mobile
+    scale.current = Math.min(targetScale, maxScale);
 
     // Apply transformations
     sphereRef.current.scale.set(scale.current, scale.current, scale.current);

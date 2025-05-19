@@ -21,7 +21,7 @@ import { useBreathingStore } from '../store/breathingStore';
  * - Collapsed state appearance
  */
 const CUSTOM_STYLES = {
-  container: "fixed left-8 top-[calc(4rem+24rem)] p-3 w-48 transform transition-all duration-300",
+  container: "md:fixed md:left-8 md:top-[calc(4rem+24rem)] p-3 w-48 md:w-48 transform transition-all duration-300",
   form: "space-y-2",
   inputGroup: "flex items-center justify-between",
   input: "w-12 p-1 rounded bg-white/10 border border-white/20 text-sm text-center",

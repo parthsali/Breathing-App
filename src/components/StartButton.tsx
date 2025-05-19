@@ -1,11 +1,15 @@
 /**
  * StartButton component that controls the breathing exercise session.
- * Provides a button to start/stop the breathing exercise and manages the initial countdown.
  * Features:
  * - Start/Stop session control
- * - Initial countdown before session start
+ * - Initial countdown management
  * - Session data persistence
- * - Theme-aware styling
+ * - Mobile-responsive styling
+ * - Theme-aware button appearance
+ * 
+ * @component
+ * @param {StartButtonProps} props - Component props for countdown callbacks
+ * @returns {JSX.Element} The rendered start/stop button
  */
 import React, { useState, useEffect } from 'react';
 import { useBreathingStore } from '../store/breathingStore';
@@ -19,7 +23,7 @@ import { InitialCountdown } from './InitialCountdown';
  * - Stop state with red color scheme
  */
 const BUTTON_STYLES = {
-  base: "absolute right-8 top-8 px-5 py-2.5 rounded-full text-white font-medium transition-all duration-300 transform hover:scale-105",
+  base: "absolute right-0 top-2 md:right-8 md:top-8 px-4 md:px-5 py-2 md:py-2.5 md:rounded-full rounded-[20px] text-white text-sm md:text-base font-medium transition-all duration-300 transform hover:scale-105",
   start: (theme: string) => ({
     background: theme,
     boxShadow: `0 4px 14px ${theme}80`

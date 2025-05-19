@@ -4,29 +4,29 @@ import { useBreathingStore } from '../store/breathingStore';
 
 const ABOUT_STYLES = {
   container: "min-h-screen relative overflow-y-auto",
-  content: "relative z-10 max-w-7xl mx-auto px-6 py-8",
+  content: "relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-16 md:py-8",
   header: "mb-6 text-center relative",
-  title: "text-2xl font-bold mb-2",
-  subtitle: "text-sm opacity-80",
-  backButton: "fixed top-6 left-6 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer",
+  title: "text-xl md:text-2xl font-bold mb-2",
+  subtitle: "text-xs md:text-sm opacity-80",
+  backButton: "fixed top-4 md:top-6 left-4 md:left-6 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 backdrop-blur-lg cursor-pointer z-50",
   section: "mb-6",
-  sectionTitle: "text-lg font-semibold mb-3",
-  card: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300 mb-4",
-  patternGrid: "grid grid-cols-2 gap-4",
-  patternCard: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300",
-  patternName: "text-base font-semibold mb-2",
-  patternTiming: "text-sm opacity-80 mb-2",
-  patternDescription: "text-sm mb-2",
-  scienceSection: "text-sm mb-2",
-  colorSection: "text-sm",
-  colorBox: "w-4 h-4 rounded-full inline-block mr-2 align-middle",
-  gridContainer: "grid grid-cols-2 gap-4",
-  infoCard: "p-4 rounded-xl backdrop-blur-lg transition-all duration-300",
-  infoTitle: "text-sm font-semibold mb-2",
-  infoContent: "text-sm leading-relaxed",
+  sectionTitle: "text-base md:text-lg font-semibold mb-3",
+  card: "p-3 md:p-4 rounded-xl backdrop-blur-lg transition-all duration-300 mb-4",
+  patternGrid: "grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4",
+  patternCard: "p-3 md:p-4 rounded-xl backdrop-blur-lg transition-all duration-300",
+  patternName: "text-sm md:text-base font-semibold mb-2",
+  patternTiming: "text-xs md:text-sm opacity-80 mb-2",
+  patternDescription: "text-xs md:text-sm mb-2",
+  scienceSection: "text-xs md:text-sm mb-2",
+  colorSection: "text-xs md:text-sm",
+  colorBox: "w-3 h-3 md:w-4 md:h-4 rounded-full inline-block mr-2 align-middle",
+  gridContainer: "grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4",
+  infoCard: "p-3 md:p-4 rounded-xl backdrop-blur-lg transition-all duration-300",
+  infoTitle: "text-xs md:text-sm font-semibold mb-2",
+  infoContent: "text-xs md:text-sm leading-relaxed",
   patternHeader: "flex items-center justify-between mb-2",
-  patternStats: "text-sm opacity-80",
-  patternContent: "space-y-2"
+  patternStats: "text-xs md:text-sm opacity-80",
+  patternContent: "space-y-1.5 md:space-y-2"
 } as const;
 
 const BREATHING_PATTERNS = [
@@ -81,6 +81,8 @@ export const AboutPage: React.FC = () => {
       className={ABOUT_STYLES.container}
       style={{ background: theme.background }}
     >
+      <div className="fixed top-0 left-0 right-0 h-16 bg-gradient-to-b from-[#00000020] to-transparent z-40" />
+      
       <button
         onClick={() => navigate('/')}
         className={ABOUT_STYLES.backButton}
@@ -88,8 +90,6 @@ export const AboutPage: React.FC = () => {
           background: `${theme.primary}40`,
           border: `1px solid ${theme.primary}40`,
           boxShadow: `0 4px 14px ${theme.primary}40`,
-          position: "fixed",
-          zIndex: 1000,
           color: theme.primary
         }}
       >
@@ -170,7 +170,7 @@ export const AboutPage: React.FC = () => {
               </p>
               <div className="mt-1.5">
                 <h3 className={ABOUT_STYLES.infoTitle} style={{ color: theme.primary }}>Key Effects:</h3>
-                <ul className="list-disc list-inside text-sm leading-relaxed" style={{ color: theme.primary }}>
+                <ul className="list-disc list-inside text-xs md:text-sm leading-relaxed" style={{ color: theme.primary }}>
                   <li>Heart rate variability</li>
                   <li>Blood pressure</li>
                   <li>Oxygen levels</li>
@@ -198,7 +198,7 @@ export const AboutPage: React.FC = () => {
                 Each pattern's color enhances its intended effect:
               </p>
               <div className="mt-1.5">
-                <ul className="list-disc list-inside text-sm leading-relaxed" style={{ color: theme.primary }}>
+                <ul className="list-disc list-inside text-xs md:text-sm leading-relaxed" style={{ color: theme.primary }}>
                   <li>Blue (Calm): Reduces stress</li>
                   <li>Green (Focus): Enhances concentration</li>
                   <li>Purple (Balance): Promotes stability</li>
