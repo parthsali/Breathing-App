@@ -3,7 +3,7 @@
  * This component sets up the 3D scene with Three.js and manages the overall layout.
  * It includes the breathing sphere visualization, controls, and navigation elements.
  */
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { BreathingSphere } from '../components/BreathingSphere';
@@ -114,26 +114,50 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [isCountdownVisible, setIsCountdownVisible] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  /**
+   * Toggles the application between fullscreen and normal windowed mode
+   */
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
 
   // Determine if buttons should be disabled
   const isButtonsDisabled = isCountdownVisible || isBreathing;
 
   // Get current phase text
-  
+
 
   return (
-    <div 
-      className="w-screen h-screen relative overflow-hidden" 
+    <div
+      className="w-screen h-screen relative overflow-hidden"
       style={{ background: theme.background }}
     >
-      <Canvas 
+      <Canvas
         camera={SCENE_CONFIG.camera}
         className="absolute inset-0"
       >
         <color attach="background" args={[theme.background]} />
-        <fog 
-          attach="fog" 
-          args={[theme.background, SCENE_CONFIG.fog.near, SCENE_CONFIG.fog.far]} 
+        <fog
+          attach="fog"
+          args={[theme.background, SCENE_CONFIG.fog.near, SCENE_CONFIG.fog.far]}
         />
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} />
@@ -150,10 +174,10 @@ const HomePage: React.FC = () => {
             <Controls />
           </div>
           <div className="relative right-0 scale-80 flex items-center gap-2">
-        
-            <StartButton 
-              onCountdownStart={() => setIsCountdownVisible(true)} 
-              onCountdownEnd={() => setIsCountdownVisible(false)} 
+
+            <StartButton
+              onCountdownStart={() => setIsCountdownVisible(true)}
+              onCountdownEnd={() => setIsCountdownVisible(false)}
             />
           </div>
         </div>
@@ -187,6 +211,18 @@ const HomePage: React.FC = () => {
             Help
           </button>
           <button
+            onClick={toggleFullscreen}
+            className={`${BUTTON_STYLES.base} text-sm px-3 py-1.5`}
+            style={{
+              ...BUTTON_STYLES.help(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
+          </button>
+          <button
             onClick={() => navigate('/stats')}
             className={`${BUTTON_STYLES.base} text-sm px-3 py-1.5`}
             style={{
@@ -217,9 +253,9 @@ const HomePage: React.FC = () => {
       <div className="hidden md:block">
         <Controls />
         <CustomBreathing />
-        <StartButton 
-          onCountdownStart={() => setIsCountdownVisible(true)} 
-          onCountdownEnd={() => setIsCountdownVisible(false)} 
+        <StartButton
+          onCountdownStart={() => setIsCountdownVisible(true)}
+          onCountdownEnd={() => setIsCountdownVisible(false)}
         />
         <BreathingTimer />
         <div className="absolute bottom-6 right-6 flex gap-4">
@@ -234,6 +270,18 @@ const HomePage: React.FC = () => {
             }}
           >
             Help
+          </button>
+          <button
+            onClick={toggleFullscreen}
+            className={`${BUTTON_STYLES.base}`}
+            style={{
+              ...BUTTON_STYLES.help(theme.primary),
+              filter: isButtonsDisabled ? 'blur(8px)' : 'none',
+              pointerEvents: isButtonsDisabled ? 'none' : 'auto',
+              opacity: isButtonsDisabled ? 0.5 : 1
+            }}
+          >
+            {isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}
           </button>
           <button
             onClick={() => navigate('/stats')}
@@ -264,14 +312,14 @@ const HomePage: React.FC = () => {
 
       {/* Help Popup */}
       {showHelp && (
-        <div 
+        <div
           className="fixed inset-0 flex items-center justify-center z-50"
           style={{ backdropFilter: 'blur(8px)' }}
           onClick={() => setShowHelp(false)}
         >
-          <div 
+          <div
             className="w-[90%] md:w-96 p-4 md:p-6 rounded-2xl transform transition-all duration-300"
-            style={{ 
+            style={{
               background: `${theme.background}ee`,
               border: `2px solid ${theme.primary}40`,
               boxShadow: `0 8px 32px ${theme.primary}40`
@@ -280,7 +328,7 @@ const HomePage: React.FC = () => {
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg md:text-xl font-bold" style={{ color: theme.primary }}>How to Use</h2>
-              <button 
+              <button
                 onClick={() => setShowHelp(false)}
                 className="text-sm opacity-60 hover:opacity-100 transition-opacity"
                 style={{ color: theme.primary }}
@@ -294,8 +342,8 @@ const HomePage: React.FC = () => {
                   <h3 className="font-medium text-sm md:text-base" style={{ color: theme.primary }}>{section.title}</h3>
                   <ul className="space-y-1.5">
                     {section.items.map((item, itemIndex) => (
-                      <li 
-                        key={itemIndex} 
+                      <li
+                        key={itemIndex}
                         className="text-xs md:text-sm opacity-80 flex items-start"
                         style={{ color: theme.primary }}
                       >
